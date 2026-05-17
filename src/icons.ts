@@ -1,5 +1,5 @@
 export const aliases: Record<string, string> = {
-     ts: "typescript",
+    ts: "typescript",
   js: "javascript",
   py: "python",
   rb: "ruby",
@@ -25,20 +25,16 @@ export const aliases: Record<string, string> = {
   linux: "linux",
 }
 
-
-
-
-export const themeless=["bash", "git", "markdown", "regex"]
+export const themeless = new Set(["bash", "git", "markdown", "regex"])
 
 
 export function resolveIcon(name: string, theme: string): string {
     const normalised = name.toLowerCase().trim()
     const resolved = aliases[normalised] ?? normalised
 
-
-
-    if(themeless.has(resolved)){
-        return resolved 
+    if (themeless.has(resolved)) {
+        return resolved
     }
-    return `resolved theme : ${resolved}-${theme}`
+
+    return `${resolved}-${theme}`
 }
