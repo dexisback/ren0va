@@ -1,0 +1,33 @@
+{
+  "name": "renova",
+  "version": "1.0.0",
+  "private": true,
+  "description": "notes: each file inside icons/ follow a standardized nomenclature -- {iconname}-{theme}.svg . some icons might have only one variant  scripts/build.ts - a node script you run with npx tsx scripts/build.ts . this reads every file in /icons and extracts the svg string, and write this to icons.json src/generate.ts -- given an array of resolved icon svg strings from icons.json, produces on big svg grid. this is pure string manipulation -- just calculating x/y positions and wrapping icons in <g transform = \"translate(x,y)\" tags src/worker.ts -- the entry point. parses the url params, calls icons.ts to resolve names, calls generate.ts to stitch, returns the response.  wrangler.toml -- tells cloudfare the worker name, and configs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "wrangler dev",
+    "deploy": "npm run build && wrangler deploy",
+    "build": "tsx scripts/build.ts",
+    "process": "tsx scripts/process.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dexisback/renova.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/dexisback/renova/issues"
+  },
+  "homepage": "https://github.com/dexisback/renova#readme",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260517.1",
+    "@types/node": "^25.8.0",
+    "tsx": "^4.22.1",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.92.0"
+  }
+}
