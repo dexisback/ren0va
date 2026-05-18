@@ -1,32 +1,30 @@
 import fs from "fs"
 import path from "path"
 
+const ICONS_DIR = path.join(process.cwd(), "icons", "processed-svg")
+const OUTPUT_FILE = path.join(process.cwd(), "icons.json")
 
-
-const ICONS_DIR = path.join(process.cwd(), "icons", "processed-svg") //reutrns /home/amaan/renova/icons/processed
-const OUTPUT_FILE = path.join(process.cwd(), "icons.json") // output file is /home/amaan/renova/icons.json ofcourse
-
-
-
-function buildFile(){
-    const result: Record<string, string> = {}  //empty object of keys and vaules (string, string )
-    const files = fs.readdirSync(ICONS_DIR)
-    for(const file of files){
-        if(!file.endsWith(".svg")) continue
-
-        const fileName = file.replace(".svg", "")
-        const filePath = path.join(ICONS_DIR, fileName)
-        const fileContent = fs.readFileSync(filePath, "utf-8").trim()
-
-        result[fileName] =fileContent  //looped up
+function buildFile() {
+    if (!fs.existsSync(ICONS_DIR)) {
+        throw new Error(`Missing icon directory: ${ICONS_DIR}`)
     }
 
-    const output = JSON.stringify(result, null, 2)
-    fs.writeFileSync(OUTPUT_FILE, output, "utf-8")
-    console.log(`build complete. ${Object.keys(result).length} icons transferred to  -> icons.json`)
+    const result: Record<string, string> = {}
+    const files = fs.readdirSync(ICONS_DIR)
+
+    for (const file of files) {
+        if (!file.endsWith(".svg")) continue
+
+        const fileName = file.replace(/\.svg$/, "")
+        const filePath = path.join(ICONS_DIR, file)
+        const fileContent = fs.readFileSync(filePath, "utf-8").trim()
+
+        result[fileName] = fileContent
+    }
+
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(result, null, 2), "utf-8")
+    console.log(`build complete. ${Object.keys(result).length} icons written to icons.json`)
 }
-
-
 
 buildFile()
 

@@ -1,7 +1,10 @@
 import iconsData from "../icons.json"
 
 
-const names = [...new Set(Object.keys(iconsData).map(name => name.replace(/-(dark|light)$/, "")))]
+const names = [...new Set(Object.keys(iconsData)
+  .map(name => name.replace(/-(dark|light)$/, ""))
+  .map(n => n.toLowerCase())
+)]
 
 
 function levenshteinAlgo(a: string, b: string) {
