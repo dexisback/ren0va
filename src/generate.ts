@@ -16,12 +16,28 @@ export function generateSvg(icons: string[], perLine: number): string {
         const x=columns * (TILE + GAP)
         const y=rows * (TILE + GAP)
 
-           const inner = svg
-      .replace(/<svg[^>]*>/, "")
-      .replace(/<\/svg>/, "")
-      .trim()
+        const inner = svg
+          .replace(/<svg[^>]*>/, "")
+          .replace(/<\/svg>/, "")
+          .trim()
 
-          return `<g transform="translate(${x}, ${y})">${inner}</g>`
+        // Determine original icon canvas width: prefer viewBox width, then width attr, fallback to 256
+        let iconWidth = 256
+        const vb = svg.match(/<svg[^>]*viewBox=["']([^"']+)["'][^>]*>/i)
+        if (vb) {
+          const parts = vb[1].trim().split(/\s+/)
+          if (parts.length === 4 && !Number.isNaN(Number(parts[2]))) {
+            iconWidth = Number(parts[2])
+          }
+        } else {
+          const w = svg.match(/<svg[^>]*\bwidth=["']?(\d+)(?:px)?["']?[^>]*>/i)
+          if (w) iconWidth = Number(w[1])
+        }
+
+        const scale = TILE / iconWidth
+
+        // translate to tile position, then scale the icon down to TILE size
+        return `<g transform="translate(${x}, ${y})"><g transform="scale(${scale})">${inner}</g></g>`
 
     })
       return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
