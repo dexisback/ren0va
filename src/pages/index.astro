@@ -293,6 +293,16 @@ const iconNames = [...new Set(
             placeholder="e.g., custom:custom/myicon, custom:custom/another"
           >
         </div>
+
+        <!-- Upload Custom SVG -->
+        <div class="control-group">
+          <label>Upload Custom SVG</label>
+          <input type="file" id="customFile" accept="image/svg+xml">
+          <div style="display:flex;gap:.5rem;margin-top:.5rem">
+            <button id="uploadBtn" class="theme-btn" type="button">Upload</button>
+            <div id="uploadStatus" style="color:#94a3b8;font-size:.9rem;align-self:center">No file selected</div>
+          </div>
+        </div>
       </div>
 
       <!-- Preview -->
@@ -325,6 +335,119 @@ const iconNames = [...new Set(
       copyBtn: document.getElementById('copyBtn'),
       perLineInput: document.getElementById('perLine'),
       customIconsInput: document.getElementById('customIcons'),
+      customFileInput: document.getElementById('customFile'),
+      uploadBtn: document.getElementById('uploadBtn'),
+      uploadStatus: document.getElementById('uploadStatus'),
+    }
+
+    // Normalize SVG to a 48x48 tile similar to build pipeline
+    function normalizeSvg(svgText) {
+      try {
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(svgText, 'image/svg+xml')
+        const svg = doc.querySelector('svg')
+        if (!svg) return null
+
+        // extract viewBox or width/height
+        let vb = svg.getAttribute('viewBox')
+        let vbWidth = 256
+        let vbHeight = 256
+        if (vb) {
+          const parts = vb.trim().split(/\s+/).map(Number)
+          if (parts.length === 4 && !Number.isNaN(parts[2])) {
+            vbWidth = parts[2]
+            vbHeight = parts[3]
+          }
+        } else {
+          const w = svg.getAttribute('width')
+          const h = svg.getAttribute('height')
+          if (w) vbWidth = Number(w.replace(/px$/, '')) || vbWidth
+          if (h) vbHeight = Number(h.replace(/px$/, '')) || vbHeight
+        }
+
+        const scale = 32 / Math.max(vbWidth, vbHeight)
+        const x = 8 + (32 - vbWidth * scale) / 2
+        const y = 8 + (32 - vbHeight * scale) / 2
+
+        // take inner content
+        const inner = svg.innerHTML
+
+        const out = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+  <rect width="48" height="48" rx="6" fill="#1e1e2e"/>
+  <g transform="translate(${x}, ${y}) scale(${scale})">
+    ${inner}
+  </g>
+</svg>`
+
+        return out
+      } catch (e) {
+        return null
+      }
+    }
+
+    async function uploadCustomFile() {
+      const fileInput = elements.customFileInput
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) return
+      const file = fileInput.files[0]
+      if (file.type !== 'image/svg+xml') {
+        elements.uploadStatus.textContent = 'Only SVG files allowed'
+        return
+      }
+
+      elements.uploadStatus.textContent = 'Reading file...'
+      const text = await file.text()
+      const normalized = normalizeSvg(text)
+      if (!normalized) {
+        elements.uploadStatus.textContent = 'Invalid SVG'
+        return
+      }
+
+      elements.uploadStatus.textContent = 'Requesting upload URL...'
+
+      // build filename slug
+      const base = (file.name || 'custom').replace(/\.svg$/i, '').replace(/[^a-z0-9_\-]/gi, '-').toLowerCase()
+
+      const res = await fetch('/custom-icons/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: base }),
+      })
+
+      if (!res.ok) {
+        elements.uploadStatus.textContent = 'Failed to get upload URL'
+        return
+      }
+
+      const data = await res.json()
+      if (!data.uploadUrl || !data.objectPath) {
+        elements.uploadStatus.textContent = 'Bad upload response'
+        return
+      }
+
+      elements.uploadStatus.textContent = 'Uploading...'
+
+      const put = await fetch(data.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'image/svg+xml' },
+        body: normalized,
+      })
+
+      if (!put.ok && put.status !== 200 && put.status !== 201) {
+        elements.uploadStatus.textContent = `Upload failed (${put.status})`
+        return
+      }
+
+      // success: add to custom icons input as custom:<objectPath>
+      const key = `custom:${data.objectPath}`
+      if (elements.customIconsInput.value.trim()) {
+        elements.customIconsInput.value = elements.customIconsInput.value + ', ' + key
+      } else {
+        elements.customIconsInput.value = key
+      }
+
+      customIcons = elements.customIconsInput.value
+      updatePreview()
+      elements.uploadStatus.textContent = 'Uploaded ✓'
     }
 
     function buildUrl() {
@@ -395,6 +518,23 @@ const iconNames = [...new Set(
       customIcons = e.target.value
       updatePreview()
     })
+
+    if (elements.uploadBtn) {
+      elements.uploadBtn.addEventListener('click', () => {
+        uploadCustomFile()
+      })
+    }
+
+    if (elements.customFileInput) {
+      elements.customFileInput.addEventListener('change', (e) => {
+        const files = e.target.files
+        if (files && files.length > 0) {
+          elements.uploadStatus.textContent = files[0].name
+        } else {
+          elements.uploadStatus.textContent = 'No file selected'
+        }
+      })
+    }
 
     elements.copyBtn.addEventListener('click', () => {
       const url = buildUrl()
