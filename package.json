@@ -7,9 +7,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "wrangler dev",
-    "deploy": "npm run build && wrangler deploy",
-    "build": "tsx scripts/build.ts",
-    "process": "tsx scripts/process.ts"
+    "build": "npm run build:icons && npm run build:astro && npm run build:embed",
+    "build:icons": "tsx scripts/build.ts",
+    "build:astro": "astro build",
+    "build:embed": "tsx scripts/embed-landing.ts",
+    "process": "tsx scripts/process.ts",
+    "deploy": "npm run build && wrangler deploy"
   },
   "repository": {
     "type": "git",
@@ -26,6 +29,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260517.1",
     "@types/node": "^25.8.0",
+    "astro": "^6.3.4",
     "tsx": "^4.22.1",
     "typescript": "^6.0.3",
     "wrangler": "^4.92.0"

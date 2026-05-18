@@ -1,0 +1,415 @@
+---
+import fs from 'fs'
+import path from 'path'
+
+// Read icons.json at build time
+const iconsPath = path.join(process.cwd(), 'icons.json')
+const iconsData = JSON.parse(fs.readFileSync(iconsPath, 'utf-8'))
+
+// Extract unique icon base names (strip theme suffix)
+const iconNames = [...new Set(
+  Object.keys(iconsData)
+    .map(name => name.replace(/-(dark|light)$/i, ''))
+    .map(n => n.toLowerCase())
+)].sort()
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renova Icons</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #94a3b8;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      padding: 0.75rem;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+    }
+
+    .theme-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      background: #1e293b;
+      color: #94a3b8;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .theme-btn.active {
+      background: #60a5fa;
+      color: #0f172a;
+      border-color: #60a5fa;
+    }
+
+    .theme-btn:hover {
+      border-color: #60a5fa;
+    }
+
+    .icon-search-results {
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      background: #1e293b;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .icon-item {
+      padding: 0.625rem 0.875rem;
+      border-bottom: 1px solid #334155;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-size: 0.875rem;
+    }
+
+    .icon-item:last-child {
+      border-bottom: none;
+    }
+
+    .icon-item:hover {
+      background: #334155;
+    }
+
+    .icon-item.selected {
+      background: #60a5fa;
+      color: #0f172a;
+    }
+
+    .preview {
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      background: #1e293b;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .preview-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .preview-frame {
+      flex: 1;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      background: #0f172a;
+      min-height: 400px;
+      overflow: auto;
+    }
+
+    .preview-frame img {
+      width: 100%;
+      height: auto;
+    }
+
+    .url-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .url-display {
+      padding: 0.75rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      word-break: break-all;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+
+    .btn-copy {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      color: #0f172a;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+    }
+
+    .btn-copy:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(96, 165, 250, 0.3);
+    }
+
+    .btn-copy:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1024px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Renova Icons</h1>
+      <p class="subtitle">Build dynamic icon grids for your README</p>
+    </header>
+
+    <div class="layout">
+      <!-- Controls -->
+      <div class="controls">
+        <!-- Icon Search -->
+        <div class="control-group">
+          <label>Icons</label>
+          <input
+            type="text"
+            id="iconSearch"
+            placeholder="Search icons (e.g., react, typescript)"
+          >
+          <div class="icon-search-results" id="iconResults"></div>
+        </div>
+
+        <!-- Theme Toggle -->
+        <div class="control-group">
+          <label>Theme</label>
+          <div class="theme-toggle">
+            <button class="theme-btn active" data-theme="dark">Dark</button>
+            <button class="theme-btn" data-theme="light">Light</button>
+          </div>
+        </div>
+
+        <!-- Per Line -->
+        <div class="control-group">
+          <label>Icons Per Line</label>
+          <input
+            type="number"
+            id="perLine"
+            value="4"
+            min="1"
+            max="10"
+          >
+        </div>
+
+        <!-- Custom Icons -->
+        <div class="control-group">
+          <label>Custom Icons (Optional)</label>
+          <input
+            type="text"
+            id="customIcons"
+            placeholder="e.g., custom:custom/myicon, custom:custom/another"
+          >
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview">
+        <div class="preview-title">Preview</div>
+        <div class="preview-frame" id="previewFrame"></div>
+        <div class="url-section">
+          <label>URL</label>
+          <div class="url-display" id="urlDisplay"></div>
+          <button class="btn-copy" id="copyBtn">Copy URL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script define:vars={{ iconNames }}>
+    const ICONS = iconNames
+    const WORKER_URL = window.location.origin + '/icons'
+
+    let selectedIcons = ['react']
+    let theme = 'dark'
+    let perLine = 4
+    let customIcons = ''
+
+    const elements = {
+      iconSearch: document.getElementById('iconSearch'),
+      iconResults: document.getElementById('iconResults'),
+      previewFrame: document.getElementById('previewFrame'),
+      urlDisplay: document.getElementById('urlDisplay'),
+      copyBtn: document.getElementById('copyBtn'),
+      perLineInput: document.getElementById('perLine'),
+      customIconsInput: document.getElementById('customIcons'),
+    }
+
+    function buildUrl() {
+      let icons = [...selectedIcons]
+      if (customIcons.trim()) {
+        icons = icons.concat(customIcons.split(',').map(s => s.trim()).filter(Boolean))
+      }
+      if (icons.length === 0) icons = ['react']
+      
+      const url = new URL(WORKER_URL)
+      url.searchParams.set('i', icons.join(','))
+      url.searchParams.set('theme', theme)
+      url.searchParams.set('perline', perLine)
+      return url.toString()
+    }
+
+    function updatePreview() {
+      const url = buildUrl()
+      elements.urlDisplay.textContent = url
+      elements.previewFrame.innerHTML = `<img src="${url}" alt="Icon preview">`
+    }
+
+    function renderIconResults() {
+      const query = elements.iconSearch.value.toLowerCase()
+      const filtered = ICONS.filter(name => name.includes(query))
+      
+      elements.iconResults.innerHTML = filtered
+        .map(name => `
+          <div class="icon-item ${selectedIcons.includes(name) ? 'selected' : ''}" data-icon="${name}">
+            ${name}
+          </div>
+        `)
+        .join('')
+      
+      document.querySelectorAll('.icon-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          const icon = e.target.dataset.icon
+          if (selectedIcons.includes(icon)) {
+            selectedIcons = selectedIcons.filter(i => i !== icon)
+          } else {
+            selectedIcons.push(icon)
+          }
+          renderIconResults()
+          updatePreview()
+        })
+      })
+    }
+
+    // Event listeners
+    elements.iconSearch.addEventListener('input', renderIconResults)
+
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'))
+        e.target.classList.add('active')
+        theme = e.target.dataset.theme
+        updatePreview()
+      })
+    })
+
+    elements.perLineInput.addEventListener('change', (e) => {
+      perLine = Math.max(1, Math.min(10, parseInt(e.target.value) || 4))
+      e.target.value = perLine
+      updatePreview()
+    })
+
+    elements.customIconsInput.addEventListener('input', (e) => {
+      customIcons = e.target.value
+      updatePreview()
+    })
+
+    elements.copyBtn.addEventListener('click', () => {
+      const url = buildUrl()
+      navigator.clipboard.writeText(url).then(() => {
+        const originalText = elements.copyBtn.textContent
+        elements.copyBtn.textContent = 'Copied!'
+        setTimeout(() => {
+          elements.copyBtn.textContent = originalText
+        }, 2000)
+      })
+    })
+
+    // Initial render
+    renderIconResults()
+    updatePreview()
+  </script>
+</body>
+</html>

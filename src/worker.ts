@@ -2,6 +2,7 @@ import iconsData from "../icons.json"
 import { resolveIcon } from "./icons"
 import { fuzzyMatch } from "./fuzzy"
 import { generateSvg } from "./generate"
+import { LANDING_HTML } from "./landing"
 
 const icons = Object.fromEntries(
     Object.entries(iconsData).map(([k, v]) => [k.toLowerCase(), v])
@@ -15,8 +16,15 @@ export default {
     async fetch(request: Request, env: Env): Promise<Response> {
         const url = new URL(request.url)
 
+        // Landing page
         if (url.pathname === "/") {
-            return new Response("renova landing page")
+            return new Response(LANDING_HTML, {
+                headers: {
+                    "Content-Type": "text/html; charset=utf-8",
+                    "Cache-Control": "public, max-age=3600",
+                    "Access-Control-Allow-Origin": "*",
+                },
+            })
         }
 
         if (url.pathname !== "/icons") {
