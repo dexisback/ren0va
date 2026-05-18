@@ -1,8 +1,8 @@
 import fs from "fs"
 import path from "path"
 
-const RAW_DIR = "icons/raw"
-const OUT_DIR = "icons/processed"
+const RAW_DIR = "icons/raw-svg"
+const OUT_DIR = "icons/processed-svg"
 
 const THEMES = {
   dark: "#1e1e2e",

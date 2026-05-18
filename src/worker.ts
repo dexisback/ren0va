@@ -14,6 +14,31 @@ type Env = {
 }
 
 type Theme = "dark" | "light"
+const MAX_UPLOAD_BYTES = 256 * 1024
+
+const ALLOWED_SVG_TAGS = new Set([
+  "svg",
+  "g",
+  "path",
+  "rect",
+  "circle",
+  "ellipse",
+  "line",
+  "polyline",
+  "polygon",
+  "text",
+  "tspan",
+  "defs",
+  "linearGradient",
+  "radialGradient",
+  "stop",
+  "clipPath",
+  "title",
+  "desc",
+  "use",
+  "mask",
+  "pattern",
+])
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -76,14 +101,68 @@ function textResponse(body: string, status = 200): Response {
   })
 }
 
-function isFileLike(value: unknown): value is { name: string; type: string; text: () => Promise<string> } {
+function isFileLike(value: unknown): value is { name: string; type: string; size: number; text: () => Promise<string> } {
   if (typeof value !== "object" || value === null) return false
   const candidate = value as Record<string, unknown>
   return (
     typeof candidate.name === "string" &&
     typeof candidate.type === "string" &&
+    typeof candidate.size === "number" &&
     typeof candidate.text === "function"
   )
+}
+
+function isAllowedTagName(tagName: string): boolean {
+  return ALLOWED_SVG_TAGS.has(tagName)
+}
+
+function sanitizeAndNormalizeSvg(svgText: string): string | null {
+  const normalized = svgText.trim()
+  const lower = normalized.toLowerCase()
+
+  const start = lower.indexOf("<svg")
+  const end = lower.lastIndexOf("</svg>")
+  if (start < 0 || end < 0 || end <= start) return null
+
+  const bannedFragments = [
+    "<script",
+    "<iframe",
+    "<object",
+    "<embed",
+    "<foreignobject",
+    "<link",
+    "<meta",
+    "javascript:",
+    "data:text/html",
+    "onload=",
+    "onerror=",
+    "onclick=",
+    "onfocus=",
+    "onmouseenter=",
+    "onmouseleave=",
+    "<style",
+  ]
+
+  for (const fragment of bannedFragments) {
+    if (lower.includes(fragment)) return null
+  }
+
+  // Quick tag-name allowlist check.
+  const tagParts = normalized.split("<")
+  for (const part of tagParts) {
+    const candidate = part.trim()
+    if (!candidate || candidate.startsWith("!") || candidate.startsWith("?")) continue
+    if (candidate.startsWith("/")) continue
+
+    const nameEnd = candidate.search(/\s|\/|>/)
+    const tagName = (nameEnd === -1 ? candidate : candidate.slice(0, nameEnd)).replace(">", "")
+    if (!isAllowedTagName(tagName)) {
+      return null
+    }
+  }
+
+  // Normalize by returning only the main <svg>...</svg> block.
+  return normalized.slice(start, end + "</svg>".length)
 }
 
 async function fetchCustomIconSvg(env: Env, customPath: string, theme: Theme): Promise<string | null> {
@@ -135,12 +214,22 @@ export default {
           return jsonResponse({ error: "missing_file" }, 400)
         }
 
+        if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
+          return jsonResponse({ error: "invalid_file_size" }, 400)
+        }
+
         if (file.type !== "image/svg+xml") {
           return jsonResponse({ error: "invalid_file_type" }, 400)
         }
 
-        const svgText = await file.text()
-        if (!svgText.includes("<svg")) {
+        const fileName = file.name.toLowerCase()
+        if (!fileName.endsWith(".svg")) {
+          return jsonResponse({ error: "invalid_file_name" }, 400)
+        }
+
+        const rawSvg = await file.text()
+        const svgText = sanitizeAndNormalizeSvg(rawSvg)
+        if (!svgText) {
           return jsonResponse({ error: "invalid_svg" }, 400)
         }
 

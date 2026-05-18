@@ -25,51 +25,6 @@ export const LANDING_HTML = `<!DOCTYPE html><html lang="en" data-astro-cid-j7pv2
       uploadStatus: document.getElementById('uploadStatus'),
     }
 
-    // Normalize SVG to a 48x48 tile similar to build pipeline
-    function normalizeSvg(svgText) {
-      try {
-        const parser = new DOMParser()
-        const doc = parser.parseFromString(svgText, 'image/svg+xml')
-        const svg = doc.querySelector('svg')
-        if (!svg) return null
-
-        // extract viewBox or width/height
-        let vb = svg.getAttribute('viewBox')
-        let vbWidth = 256
-        let vbHeight = 256
-        if (vb) {
-          const parts = vb.trim().split(/\\s+/).map(Number)
-          if (parts.length === 4 && !Number.isNaN(parts[2])) {
-            vbWidth = parts[2]
-            vbHeight = parts[3]
-          }
-        } else {
-          const w = svg.getAttribute('width')
-          const h = svg.getAttribute('height')
-          if (w) vbWidth = Number(w.replace(/px\$/, '')) || vbWidth
-          if (h) vbHeight = Number(h.replace(/px\$/, '')) || vbHeight
-        }
-
-        const scale = 32 / Math.max(vbWidth, vbHeight)
-        const x = 8 + (32 - vbWidth * scale) / 2
-        const y = 8 + (32 - vbHeight * scale) / 2
-
-        // take inner content
-        const inner = svg.innerHTML
-
-        const out = \`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
-  <rect width="48" height="48" rx="6" fill="#1e1e2e"/>
-  <g transform="translate(\${x}, \${y}) scale(\${scale})">
-    \${inner}
-  </g>
-</svg>\`
-
-        return out
-      } catch (e) {
-        return null
-      }
-    }
-
     async function uploadCustomFile() {
       const fileInput = elements.customFileInput
       if (!fileInput || !fileInput.files || fileInput.files.length === 0) return
@@ -79,46 +34,23 @@ export const LANDING_HTML = `<!DOCTYPE html><html lang="en" data-astro-cid-j7pv2
         return
       }
 
-      elements.uploadStatus.textContent = 'Reading file...'
-      const text = await file.text()
-      const normalized = normalizeSvg(text)
-      if (!normalized) {
-        elements.uploadStatus.textContent = 'Invalid SVG'
-        return
-      }
+      elements.uploadStatus.textContent = 'Uploading...'
+      const formData = new FormData()
+      formData.append('file', file)
 
-      elements.uploadStatus.textContent = 'Requesting upload URL...'
-
-      // build filename slug
-      const base = (file.name || 'custom').replace(/\\.svg\$/i, '').replace(/[^a-z0-9_\\-]/gi, '-').toLowerCase()
-
-      const res = await fetch('/custom-icons/upload-url', {
+      const res = await fetch('/custom-icons/upload', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: base }),
+        body: formData,
       })
 
       if (!res.ok) {
-        elements.uploadStatus.textContent = 'Failed to get upload URL'
+        elements.uploadStatus.textContent = \`Upload failed (\${res.status})\`
         return
       }
 
       const data = await res.json()
-      if (!data.uploadUrl || !data.objectPath) {
+      if (!data.objectPath) {
         elements.uploadStatus.textContent = 'Bad upload response'
-        return
-      }
-
-      elements.uploadStatus.textContent = 'Uploading...'
-
-      const put = await fetch(data.uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'image/svg+xml' },
-        body: normalized,
-      })
-
-      if (!put.ok && put.status !== 200 && put.status !== 201) {
-        elements.uploadStatus.textContent = \`Upload failed (\${put.status})\`
         return
       }
 
