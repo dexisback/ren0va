@@ -4,6 +4,10 @@ import { fuzzyMatch } from "./fuzzy"
 import { generateSvg } from "./generate"
 import { LANDING_HTML } from "./landing"
 
+// ---------------------------------------------------------------------------
+// Data and Types
+// ---------------------------------------------------------------------------
+
 const icons = Object.fromEntries(
   Object.entries(iconsData).map(([k, v]) => [k.toLowerCase(), v])
 ) as Record<string, string>
@@ -46,8 +50,35 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type",
 }
 
+// ---------------------------------------------------------------------------
+// Generic Helpers
+// ---------------------------------------------------------------------------
+
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  })
+}
+
+function textResponse(body: string, status = 200): Response {
+  return new Response(body, {
+    status,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
+  })
+}
+
 function trimTrailingSlash(value: string): string {
   return value.endsWith("/") ? value.slice(0, -1) : value
+}
+
+function withoutPrefix(value: string, prefix: string): string {
+  return value.startsWith(prefix) ? value.slice(prefix.length) : value
 }
 
 function parseTheme(raw: string | null): Theme {
@@ -78,30 +109,24 @@ function sanitizeFilename(name: string): string {
   return out
 }
 
-function withoutPrefix(value: string, prefix: string): string {
-  return value.startsWith(prefix) ? value.slice(prefix.length) : value
+function indexOfTagNameEnd(value: string): number {
+  for (let i = 0; i < value.length; i++) {
+    const ch = value[i]
+    if (ch === " " || ch === "\t" || ch === "\n" || ch === "\r" || ch === "/" || ch === ">") {
+      return i
+    }
+  }
+  return -1
 }
 
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-    },
-  })
-}
+// ---------------------------------------------------------------------------
+// Upload Validation and Sanitization
+// ---------------------------------------------------------------------------
 
-function textResponse(body: string, status = 200): Response {
-  return new Response(body, {
-    status,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-    },
-  })
-}
+type FileLike = { name: string; type: string; size: number; text: () => Promise<string> }
 
-function isFileLike(value: unknown): value is { name: string; type: string; size: number; text: () => Promise<string> } {
+
+function isFileLike(value: unknown): value is FileLike {
   if (typeof value !== "object" || value === null) return false
   const candidate = value as Record<string, unknown>
   return (
@@ -154,7 +179,7 @@ function sanitizeAndNormalizeSvg(svgText: string): string | null {
     if (!candidate || candidate.startsWith("!") || candidate.startsWith("?")) continue
     if (candidate.startsWith("/")) continue
 
-    const nameEnd = candidate.search(/\s|\/|>/)
+    const nameEnd = indexOfTagNameEnd(candidate)
     const tagName = (nameEnd === -1 ? candidate : candidate.slice(0, nameEnd)).replace(">", "")
     if (!isAllowedTagName(tagName)) {
       return null
@@ -164,6 +189,23 @@ function sanitizeAndNormalizeSvg(svgText: string): string | null {
   // Normalize by returning only the main <svg>...</svg> block.
   return normalized.slice(start, end + "</svg>".length)
 }
+
+function validateUploadFile(file: FileLike): string | null {
+  if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
+    return "invalid_file_size"
+  }
+  if (file.type !== "image/svg+xml") {
+    return "invalid_file_type"
+  }
+  if (!file.name.toLowerCase().endsWith(".svg")) {
+    return "invalid_file_name"
+  }
+  return null
+}
+
+// ---------------------------------------------------------------------------
+// Icon Resolution
+// ---------------------------------------------------------------------------
 
 async function fetchCustomIconSvg(env: Env, customPath: string, theme: Theme): Promise<string | null> {
   const baseUrl = trimTrailingSlash(env.SUPABASE_URL)
@@ -198,120 +240,138 @@ async function resolveSvg(name: string, env: Env, theme: Theme): Promise<string 
   return icons[baseKey] ?? null
 }
 
+// ---------------------------------------------------------------------------
+// Route Handlers
+// ---------------------------------------------------------------------------
+
+function handlePreflight(): Response {
+  return new Response(null, { status: 204, headers: CORS_HEADERS })
+}
+
+function handleLandingPage(): Response {
+  return new Response(LANDING_HTML, {
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=3600",
+      "Access-Control-Allow-Origin": "*",
+    },
+  })
+}
+
+async function handleUpload(request: Request, env: Env): Promise<Response> {
+  try {
+    const form = await request.formData()
+    const file = form.get("file")
+    if (!isFileLike(file)) {
+      return jsonResponse({ error: "missing_file" }, 400)
+    }
+
+    const validationError = validateUploadFile(file)
+    if (validationError) {
+      return jsonResponse({ error: validationError }, 400)
+    }
+
+    const rawSvg = await file.text()
+    const svgText = sanitizeAndNormalizeSvg(rawSvg)
+    if (!svgText) {
+      return jsonResponse({ error: "invalid_svg" }, 400)
+    }
+
+    const rawName = file.name || "custom"
+    const dotIndex = rawName.lastIndexOf(".")
+    const baseName = dotIndex > 0 ? rawName.slice(0, dotIndex) : rawName
+    const desiredName = baseName.toLowerCase()
+    const desired = sanitizeFilename(desiredName)
+    const id = Date.now().toString(36)
+    const objectPath = desired ? `custom/${desired}-${id}` : `custom/${id}`
+
+    if (!env.SUPABASE_SERVICE_ROLE_KEY) {
+      return jsonResponse({ error: "server misconfigured" }, 500)
+    }
+
+    
+    //NOTE: direct service trip from supabase to worker (No signed URL round-trip needed)
+    const baseUrl = trimTrailingSlash(env.SUPABASE_URL)
+    const uploadUrl = `${baseUrl}/storage/v1/object/icons/${encodeURIComponent(objectPath)}.svg`
+    const uploadRes = await fetch(uploadUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        "Content-Type": "image/svg+xml",
+        "x-upsert": "true",
+      },
+      body: svgText,
+    })
+
+    if (!uploadRes.ok) {
+      const detail = await uploadRes.text()
+      return jsonResponse({ error: "upload_failed", detail }, 502)
+    }
+
+    return jsonResponse({ objectPath })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "bad request"
+    return jsonResponse({ error: "bad_request", message }, 400)
+  }
+}
+
+async function handleIcons(url: URL, env: Env): Promise<Response> {
+  const raw = url.searchParams.get("i") ?? ""
+  if (!raw) {
+    return textResponse("missing ?i=param", 400)
+  }
+
+  const theme = parseTheme(url.searchParams.get("theme"))
+  const perLine = parsePerLine(url.searchParams.get("perline"))
+  const names = splitCsv(raw)
+
+  const svgs: string[] = []
+  for (const name of names) {
+    const svg = await resolveSvg(name, env, theme)
+    if (svg) {
+      svgs.push(svg)
+    }
+  }
+
+  if (svgs.length === 0) {
+    return textResponse("no valid icons found", 400)
+  }
+
+  const output = generateSvg(svgs, perLine)
+  return new Response(output, {
+    headers: {
+      "Content-Type": "image/svg+xml",
+      "Cache-Control": "public, max-age=3600",
+      "Access-Control-Allow-Origin": "*",
+    },
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Worker Entry
+// ---------------------------------------------------------------------------
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
 
     if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: CORS_HEADERS })
+      return handlePreflight()
     }
 
     if (url.pathname === "/custom-icons/upload" && request.method === "POST") {
-      try {
-        const form = await request.formData()
-        const file = form.get("file")
-        if (!isFileLike(file)) {
-          return jsonResponse({ error: "missing_file" }, 400)
-        }
-
-        if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
-          return jsonResponse({ error: "invalid_file_size" }, 400)
-        }
-
-        if (file.type !== "image/svg+xml") {
-          return jsonResponse({ error: "invalid_file_type" }, 400)
-        }
-
-        const fileName = file.name.toLowerCase()
-        if (!fileName.endsWith(".svg")) {
-          return jsonResponse({ error: "invalid_file_name" }, 400)
-        }
-
-        const rawSvg = await file.text()
-        const svgText = sanitizeAndNormalizeSvg(rawSvg)
-        if (!svgText) {
-          return jsonResponse({ error: "invalid_svg" }, 400)
-        }
-
-        const rawName = file.name || "custom"
-        const dotIndex = rawName.lastIndexOf(".")
-        const baseName = dotIndex > 0 ? rawName.slice(0, dotIndex) : rawName
-        const desiredName = baseName.toLowerCase()
-        const desired = sanitizeFilename(desiredName)
-        const id = Date.now().toString(36)
-        const objectPath = desired ? `custom/${desired}-${id}` : `custom/${id}`
-
-        if (!env.SUPABASE_SERVICE_ROLE_KEY) {
-          return jsonResponse({ error: "server misconfigured" }, 500)
-        }
-
-        const baseUrl = trimTrailingSlash(env.SUPABASE_URL)
-        const uploadUrl = `${baseUrl}/storage/v1/object/icons/${encodeURIComponent(objectPath)}.svg`
-        const uploadRes = await fetch(uploadUrl, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-            apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-            "Content-Type": "image/svg+xml",
-            "x-upsert": "true",
-          },
-          body: svgText,
-        })
-
-        if (!uploadRes.ok) {
-          const detail = await uploadRes.text()
-          return jsonResponse({ error: "upload_failed", detail }, 502)
-        }
-
-        return jsonResponse({ objectPath })
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "bad request"
-        return jsonResponse({ error: "bad_request", message }, 400)
-      }
+      return handleUpload(request, env)
     }
 
     if (url.pathname === "/") {
-      return new Response(LANDING_HTML, {
-        headers: {
-          "Content-Type": "text/html; charset=utf-8",
-          "Cache-Control": "public, max-age=3600",
-          "Access-Control-Allow-Origin": "*",
-        },
-      })
+      return handleLandingPage()
     }
 
-    if (url.pathname !== "/icons") {
-      return textResponse("not found", 404)
+    if (url.pathname === "/icons" && request.method === "GET") {
+      return handleIcons(url, env)
     }
 
-    const raw = url.searchParams.get("i") ?? ""
-    if (!raw) {
-      return textResponse("missing ?i=param", 400)
-    }
-
-    const theme = parseTheme(url.searchParams.get("theme"))
-    const perLine = parsePerLine(url.searchParams.get("perline"))
-    const names = splitCsv(raw)
-
-    const svgs: string[] = []
-    for (const name of names) {
-      const svg = await resolveSvg(name, env, theme)
-      if (svg) {
-        svgs.push(svg)
-      }
-    }
-
-    if (svgs.length === 0) {
-      return textResponse("no valid icons found", 400)
-    }
-
-    const output = generateSvg(svgs, perLine)
-    return new Response(output, {
-      headers: {
-        "Content-Type": "image/svg+xml",
-        "Cache-Control": "public, max-age=3600",
-        "Access-Control-Allow-Origin": "*",
-      },
-    })
+    return textResponse("not found", 404)
   },
 }
