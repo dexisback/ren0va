@@ -24,7 +24,7 @@ export function generateSvg(icons: string[], perLine: number): string {
         // Determine original icon canvas width: prefer viewBox width, then width attr, fallback to 256
         let iconWidth = 256
         const vb = svg.match(/<svg[^>]*viewBox=["']([^"']+)["'][^>]*>/i)
-        if (vb) {
+        if (vb && vb[1]) {
           const parts = vb[1].trim().split(/\s+/)
           if (parts.length === 4 && !Number.isNaN(Number(parts[2]))) {
             iconWidth = Number(parts[2])

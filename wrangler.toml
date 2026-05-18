@@ -3,6 +3,7 @@ main = "src/worker.ts"
 compatibility_date = "2024-06-20"
 
 [vars]
-SUPABASE_URL = "https://your-project.supabase.co"
+SUPABASE_URL = "https://renova.supabase.co"
+
 
 

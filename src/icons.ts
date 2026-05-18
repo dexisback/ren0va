@@ -25,7 +25,7 @@ export const aliases: Record<string, string> = {
   linux: "linux",
 }
 
-export const themeless = new Set(["bash", "git", "markdown", "regex"])
+export const themeless = new Set(["bash", "git", "markdown", "regex", "typescript"])
 
 
 export function resolveIcon(name: string, theme: string): string {
