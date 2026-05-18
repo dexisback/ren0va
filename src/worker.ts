@@ -20,30 +20,6 @@ type Env = {
 type Theme = "dark" | "light"
 const MAX_UPLOAD_BYTES = 256 * 1024
 
-const ALLOWED_SVG_TAGS = new Set([
-  "svg",
-  "g",
-  "path",
-  "rect",
-  "circle",
-  "ellipse",
-  "line",
-  "polyline",
-  "polygon",
-  "text",
-  "tspan",
-  "defs",
-  "linearGradient",
-  "radialGradient",
-  "stop",
-  "clipPath",
-  "title",
-  "desc",
-  "use",
-  "mask",
-  "pattern",
-])
-
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
@@ -109,16 +85,6 @@ function sanitizeFilename(name: string): string {
   return out
 }
 
-function indexOfTagNameEnd(value: string): number {
-  for (let i = 0; i < value.length; i++) {
-    const ch = value[i]
-    if (ch === " " || ch === "\t" || ch === "\n" || ch === "\r" || ch === "/" || ch === ">") {
-      return i
-    }
-  }
-  return -1
-}
-
 // ---------------------------------------------------------------------------
 // Upload Validation and Sanitization
 // ---------------------------------------------------------------------------
@@ -137,57 +103,22 @@ function isFileLike(value: unknown): value is FileLike {
   )
 }
 
-function isAllowedTagName(tagName: string): boolean {
-  return ALLOWED_SVG_TAGS.has(tagName)
-}
-
-function sanitizeAndNormalizeSvg(svgText: string): string | null {
+function sanitizeAndNormalizeSvg(svgText: string): { svg: string | null; reason?: string } {
   const normalized = svgText.trim()
   const lower = normalized.toLowerCase()
 
   const start = lower.indexOf("<svg")
   const end = lower.lastIndexOf("</svg>")
-  if (start < 0 || end < 0 || end <= start) return null
+  if (start < 0 || end < 0 || end <= start) return { svg: null, reason: "missing_svg_root" }
 
-  const bannedFragments = [
-    "<script",
-    "<iframe",
-    "<object",
-    "<embed",
-    "<foreignobject",
-    "<link",
-    "<meta",
-    "javascript:",
-    "data:text/html",
-    "onload=",
-    "onerror=",
-    "onclick=",
-    "onfocus=",
-    "onmouseenter=",
-    "onmouseleave=",
-    "<style",
-  ]
+  const bannedFragments = ["<script", "javascript:", "data:text/html"]
 
   for (const fragment of bannedFragments) {
-    if (lower.includes(fragment)) return null
-  }
-
-  // Quick tag-name allowlist check.
-  const tagParts = normalized.split("<")
-  for (const part of tagParts) {
-    const candidate = part.trim()
-    if (!candidate || candidate.startsWith("!") || candidate.startsWith("?")) continue
-    if (candidate.startsWith("/")) continue
-
-    const nameEnd = indexOfTagNameEnd(candidate)
-    const tagName = (nameEnd === -1 ? candidate : candidate.slice(0, nameEnd)).replace(">", "")
-    if (!isAllowedTagName(tagName)) {
-      return null
-    }
+    if (lower.includes(fragment)) return { svg: null, reason: `blocked_fragment:${fragment}` }
   }
 
   // Normalize by returning only the main <svg>...</svg> block.
-  return normalized.slice(start, end + "</svg>".length)
+  return { svg: normalized.slice(start, end + "</svg>".length) }
 }
 
 function validateUploadFile(file: FileLike): string | null {
@@ -272,9 +203,9 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
     }
 
     const rawSvg = await file.text()
-    const svgText = sanitizeAndNormalizeSvg(rawSvg)
-    if (!svgText) {
-      return jsonResponse({ error: "invalid_svg" }, 400)
+    const sanitized = sanitizeAndNormalizeSvg(rawSvg)
+    if (!sanitized.svg) {
+      return jsonResponse({ error: "invalid_svg", reason: sanitized.reason ?? "unknown" }, 400)
     }
 
     const rawName = file.name || "custom"
@@ -301,7 +232,7 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
         "Content-Type": "image/svg+xml",
         "x-upsert": "true",
       },
-      body: svgText,
+      body: sanitized.svg,
     })
 
     if (!uploadRes.ok) {
