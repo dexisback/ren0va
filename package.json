@@ -32,6 +32,7 @@
     "astro": "^6.3.4",
     "tsx": "^4.22.1",
     "typescript": "^6.0.3",
-    "wrangler": "^4.92.0"
+    "wrangler": "^4.92.0",
+    "fast-xml-parser": "^4.3.4"
   }
 }
