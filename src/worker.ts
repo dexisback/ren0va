@@ -53,7 +53,13 @@ export default {
 
             const matched = fuzzyMatch(name)
             const key = resolveIcon(matched, theme)
-            const svg = icons[key]
+            let svg = icons[key]
+
+            // Fallback: if theme-suffixed key doesn't exist, try base name without theme
+            if (!svg && theme !== matched) {
+                const baseKey = matched.toLowerCase().trim()
+                svg = icons[baseKey]
+            }
 
             if (svg) {
                 svgs.push(svg)
