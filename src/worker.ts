@@ -194,6 +194,9 @@ function contentTypeForAsset(pathname: string): string {
   if (pathname.endsWith(".css")) return "text/css; charset=utf-8"
   if (pathname.endsWith(".js")) return "application/javascript; charset=utf-8"
   if (pathname.endsWith(".map")) return "application/json; charset=utf-8"
+  if (pathname.endsWith(".woff2")) return "font/woff2"
+  if (pathname.endsWith(".woff")) return "font/woff"
+  if (pathname.endsWith(".ttf")) return "font/ttf"
   return "application/octet-stream"
 }
 
@@ -201,7 +204,10 @@ function handleLandingAsset(pathname: string): Response {
   const content = LANDING_ASSETS[pathname]
   if (!content) return textResponse("not found", 404)
 
-  return new Response(content, {
+  const body =
+    content.encoding === "base64" ? Uint8Array.from(atob(content.data), (c) => c.charCodeAt(0)) : content.data
+
+  return new Response(body, {
     headers: {
       "Content-Type": contentTypeForAsset(pathname),
       "Cache-Control": "public, max-age=31536000, immutable",

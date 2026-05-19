@@ -177,24 +177,71 @@ export default function Landing({ iconNames }: Props) {
     <div className="landing">
       <header className="topbar">
         <div className="brand">
-          <span className="brandMark" aria-hidden="true">
-            r
-          </span>
           <div className="brandText">
-            <h1 className="brandTitle">ren0va</h1>
-            <p className="brandTagline">Generate minimal icon grids for docs, slides, and prototypes.</p>
+            <div className="brandTitleRow">
+              <h1 className="brandTitle">ren0va</h1>
+              <motion.svg
+                className="brandScribble"
+                viewBox="0 0 220 24"
+                aria-hidden="true"
+                initial={reducedMotion ? false : { opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.12 } }}
+              >
+                <motion.path
+                  d="M4 18 C 42 8, 80 22, 118 14 S 192 10, 216 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={reducedMotion ? false : { pathLength: 0, opacity: 0.9 }}
+                  animate={{
+                    pathLength: 1,
+                    opacity: 1,
+                    transition: { type: "spring", stiffness: 280, damping: 28, mass: 0.7 },
+                  }}
+                />
+              </motion.svg>
+            </div>
           </div>
         </div>
 
         <nav className="topActions" aria-label="Links">
-          <a className="topLink" href="#" aria-disabled="true" onClick={(e) => e.preventDefault()}>
-            Docs
+          <a className="iconLink" href="#" aria-label="Docs" aria-disabled="true" onClick={(e) => e.preventDefault()}>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M7 4.5h9a2 2 0 0 1 2 2V20a1 1 0 0 1-1.447.894L12 18.5l-4.553 2.394A1 1 0 0 1 6 20V6.5a2 2 0 0 1 1-2Z"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinejoin="round"
+              />
+              <path d="M9 8.5h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              <path d="M9 11.5h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
           </a>
-          <a className="topLink" href="https://github.com/dexisback/renova" target="_blank" rel="noreferrer">
-            GitHub
+          <a
+            className="iconLink"
+            href="https://github.com/dexisback/renova"
+            aria-label="GitHub"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M12 2.6a9.4 9.4 0 0 0-2.97 18.32c.47.09.64-.2.64-.45v-1.64c-2.6.57-3.15-1.1-3.15-1.1-.43-1.08-1.06-1.37-1.06-1.37-.86-.57.06-.56.06-.56.95.07 1.45.98 1.45.98.85 1.45 2.23 1.03 2.78.79.09-.62.33-1.03.6-1.27-2.08-.24-4.27-1.04-4.27-4.63 0-1.02.37-1.86.98-2.52-.1-.24-.42-1.2.09-2.5 0 0 .8-.26 2.62.96a9.04 9.04 0 0 1 4.78 0c1.82-1.22 2.62-.96 2.62-.96.51 1.3.2 2.26.1 2.5.6.66.98 1.5.98 2.52 0 3.6-2.19 4.39-4.28 4.62.35.3.66.9.66 1.82v2.7c0 .25.16.55.64.45A9.4 9.4 0 0 0 12 2.6Z"
+                fill="currentColor"
+                opacity="0.92"
+              />
+            </svg>
           </a>
-          <a className="topLink" href="#" aria-disabled="true" onClick={(e) => e.preventDefault()}>
-            TWT
+          <a className="iconLink" href="#" aria-label="Twitter" aria-disabled="true" onClick={(e) => e.preventDefault()}>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M18.8 7.2c.01.18.01.37.01.55 0 5.6-4.26 12.05-12.05 12.05-2.39 0-4.6-.7-6.46-1.9.33.04.66.05 1 .05 1.98 0 3.8-.67 5.25-1.8a4.24 4.24 0 0 1-3.96-2.95c.26.04.52.07.8.07.38 0 .77-.05 1.13-.15a4.23 4.23 0 0 1-3.39-4.15v-.06c.57.32 1.22.51 1.92.53a4.24 4.24 0 0 1-1.31-5.64 12.03 12.03 0 0 0 8.74 4.43 4.23 4.23 0 0 1 7.2-3.86 8.4 8.4 0 0 0 2.69-1.03 4.22 4.22 0 0 1-1.86 2.34 8.44 8.44 0 0 0 2.43-.66 9.08 9.08 0 0 1-2.12 2.2Z"
+                fill="currentColor"
+                opacity="0.92"
+              />
+            </svg>
           </a>
         </nav>
       </header>
