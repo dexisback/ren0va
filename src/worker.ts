@@ -3,6 +3,7 @@ import { resolveIcon } from "./icons"
 import { fuzzyMatch } from "./fuzzy"
 import { generateSvg } from "./generate"
 import { LANDING_HTML } from "./landing"
+import { LANDING_ASSETS } from "./landing-assets"
 
 // ---------------------------------------------------------------------------
 // Data and Types
@@ -189,6 +190,26 @@ function handleLandingPage(): Response {
   })
 }
 
+function contentTypeForAsset(pathname: string): string {
+  if (pathname.endsWith(".css")) return "text/css; charset=utf-8"
+  if (pathname.endsWith(".js")) return "application/javascript; charset=utf-8"
+  if (pathname.endsWith(".map")) return "application/json; charset=utf-8"
+  return "application/octet-stream"
+}
+
+function handleLandingAsset(pathname: string): Response {
+  const content = LANDING_ASSETS[pathname]
+  if (!content) return textResponse("not found", 404)
+
+  return new Response(content, {
+    headers: {
+      "Content-Type": contentTypeForAsset(pathname),
+      "Cache-Control": "public, max-age=31536000, immutable",
+      "Access-Control-Allow-Origin": "*",
+    },
+  })
+}
+
 async function handleUpload(request: Request, env: Env): Promise<Response> {
   try {
     const form = await request.formData()
@@ -297,6 +318,10 @@ export default {
 
     if (url.pathname === "/") {
       return handleLandingPage()
+    }
+
+    if (url.pathname.startsWith("/_astro/") && request.method === "GET") {
+      return handleLandingAsset(url.pathname)
     }
 
     if (url.pathname === "/icons" && request.method === "GET") {

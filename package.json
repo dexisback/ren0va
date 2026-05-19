@@ -29,9 +29,17 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260517.1",
     "@types/node": "^25.8.0",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
     "astro": "^6.3.4",
     "tsx": "^4.22.1",
     "typescript": "^6.0.3",
     "wrangler": "^4.92.0"
+  },
+  "dependencies": {
+    "@astrojs/react": "^5.0.5",
+    "motion": "^12.39.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
   }
 }
