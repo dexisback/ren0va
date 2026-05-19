@@ -181,24 +181,40 @@ export default function Landing({ iconNames }: Props) {
             <div className="brandTitleRow">
               <h1 className="brandTitle">ren0va</h1>
               <motion.svg
-                className="brandScribble"
-                viewBox="0 0 220 24"
+                className="brandMarking"
+                viewBox="0 0 320 64"
+                preserveAspectRatio="none"
                 aria-hidden="true"
                 initial={reducedMotion ? false : { opacity: 0 }}
                 animate={{ opacity: 1, transition: { duration: 0.12 } }}
               >
                 <motion.path
-                  d="M4 18 C 42 8, 80 22, 118 14 S 192 10, 216 16"
+                  // Full-width highlight: left -> right with a slight oblique lift (3rd -> 1st quadrant feel)
+                  d="M8 46 C 66 28, 132 54, 192 40 S 268 30, 312 36"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="3"
+                  strokeWidth="10"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  initial={reducedMotion ? false : { pathLength: 0, opacity: 0.9 }}
+                  initial={reducedMotion ? false : { pathLength: 0, opacity: 0.32 }}
                   animate={{
                     pathLength: 1,
-                    opacity: 1,
+                    opacity: 0.42,
                     transition: { type: "spring", stiffness: 280, damping: 28, mass: 0.7 },
+                  }}
+                />
+                <motion.path
+                  d="M12 54 C 74 36, 138 60, 204 46 S 276 38, 316 44"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={reducedMotion ? false : { pathLength: 0, opacity: 0.26 }}
+                  animate={{
+                    pathLength: 1,
+                    opacity: 0.34,
+                    transition: { type: "spring", stiffness: 240, damping: 30, mass: 0.8, delay: 0.06 },
                   }}
                 />
               </motion.svg>
