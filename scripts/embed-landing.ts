@@ -3,7 +3,40 @@ import path from "path"
 
 // Read the built Astro HTML
 const builtPath = path.join(process.cwd(), "dist-astro", "index.html")
-const html = fs.readFileSync(builtPath, "utf-8")
+let html = fs.readFileSync(builtPath, "utf-8")
+
+// Find all CSS links and inline them
+const linkRegex = /<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g
+html = html.replace(linkRegex, (match, href) => {
+  try {
+    // href will typically be something like "/_astro/index.D9IDFaEh.css"
+    // We need to resolve it relative to the dist-astro directory
+    const cssPath = path.join(process.cwd(), "dist-astro", href.replace(/^\//, ''))
+    if (fs.existsSync(cssPath)) {
+      const cssContent = fs.readFileSync(cssPath, "utf-8")
+      return `<style>${cssContent}</style>`
+    }
+  } catch (e) {
+    console.warn(`Failed to inline CSS for ${href}`, e)
+  }
+  return match
+})
+
+// Also find and inline scripts just in case Astro extracts them
+const scriptRegex = /<script[^>]*type="module"[^>]*src="([^"]+)"[^>]*><\/script>/g
+html = html.replace(scriptRegex, (match, src) => {
+  try {
+    const scriptPath = path.join(process.cwd(), "dist-astro", src.replace(/^\//, ''))
+    if (fs.existsSync(scriptPath)) {
+      const scriptContent = fs.readFileSync(scriptPath, "utf-8")
+      return `<script type="module">${scriptContent}</script>`
+    }
+  } catch (e) {
+    console.warn(`Failed to inline JS for ${src}`, e)
+  }
+  return match
+})
+
 
 // Escape HTML for TypeScript string literal
 const escaped = html
@@ -19,4 +52,4 @@ export const LANDING_HTML = \`${escaped}\`
 `
 
 fs.writeFileSync(path.join(process.cwd(), "src", "landing.ts"), output)
-console.log("embedded astro landing page into src/landing.ts")
+console.log("embedded astro landing page into src/landing.ts (inlined CSS/JS)")

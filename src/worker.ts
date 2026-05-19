@@ -18,7 +18,7 @@ type Env = {
 }
 
 type Theme = "dark" | "light"
-const MAX_UPLOAD_BYTES = 256 * 1024
+const MAX_UPLOAD_BYTES = 512 * 1024
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -183,7 +183,7 @@ function handleLandingPage(): Response {
   return new Response(LANDING_HTML, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "no-store",
       "Access-Control-Allow-Origin": "*",
     },
   })

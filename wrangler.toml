@@ -6,7 +6,6 @@ routes= [
 
 ]
 [vars]
-SUPABASE_URL = "https://renova.supabase.co"
-
+SUPABASE_URL = "https://qxxcdxafqxxtwzxbflys.supabase.co"
 
 
