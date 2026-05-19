@@ -10,3 +10,7 @@ node_modules/
 .tsbuildinfo
 icons.json
 icons/processed-svg/
+skills-lock.json
+.agents/*
+.astro
+dist-astro/*
