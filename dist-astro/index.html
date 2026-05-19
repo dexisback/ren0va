@@ -1,1 +1,289 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ren0va</title><meta name="description" content="Generate minimal icon grids via URL params. Pick icons, theme, and density — then share the link."><link rel="stylesheet" href="/_astro/index.BCcNiueX.css"></head> <body> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var g=Object.defineProperty;var w=(c,s,d)=>s in c?g(c,s,{enumerable:!0,configurable:!0,writable:!0,value:d}):c[s]=d;var l=(c,s,d)=>w(c,typeof s!="symbol"?s+"":s,d);var E=new Set(["__proto__","constructor","prototype"]);{let c={0:t=>y(t),1:t=>d(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(d(t)),5:t=>new Set(d(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>Number.POSITIVE_INFINITY*t},s=t=>{let[p,e]=t;return p in c?c[p](e):void 0},d=t=>t.map(s),y=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([p,e])=>[p,s(e)]));class f extends HTMLElement{constructor(){super(...arguments);l(this,"Component");l(this,"hydrator");l(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let n=this.querySelectorAll("astro-slot"),r={},i=this.querySelectorAll("template[data-astro-template]");for(let o of i){let a=o.closest(this.tagName);a!=null&&a.isSameNode(this)&&(r[o.getAttribute("data-astro-template")||"default"]=o.innerHTML,o.remove())}for(let o of n){let a=o.closest(this.tagName);a!=null&&a.isSameNode(this)&&(r[o.getAttribute("name")||"default"]=o.innerHTML)}let u;try{u=this.hasAttribute("props")?y(JSON.parse(this.getAttribute("props"))):{}}catch(o){let a=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(a+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${a}`,this.getAttribute("props"),o),o}let h;await this.hydrator(this)(this.Component,u,r,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});l(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),n.disconnect(),this.childrenConnectedCallback()},n=new MutationObserver(()=>{var r;((r=this.lastChild)==null?void 0:r.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});n.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}getRetryImportUrl(e){let n=new URL(e,document.baseURI),r=`astro-retry=${Date.now()}`,i=n.hash.replace(/^#/,"");return n.hash=i?`${i}&${r}`:r,n.toString()}async importWithRetry(e){try{return await import(e)}catch(n){return await new Promise(r=>setTimeout(r,1e3)),import(this.getRetryImportUrl(e))}}handleHydrationError(e){let n=this.getAttribute("component-url"),r=new CustomEvent("astro:hydration-error",{cancelable:!0,bubbles:!0,composed:!0,detail:{error:e,componentUrl:n}});this.dispatchEvent(r)&&console.error(`[astro-island] Error hydrating ${n}`,e)}async start(){let e=JSON.parse(this.getAttribute("opts")),n=this.getAttribute("client");if(Astro[n]===void 0){window.addEventListener(`astro:${n}`,()=>this.start(),{once:!0});return}try{await Astro[n](async()=>{let r=this.getAttribute("renderer-url");try{let[i,{default:u}]=await Promise.all([this.importWithRetry(this.getAttribute("component-url")),r?this.importWithRetry(r):Promise.resolve({default:()=>()=>{}})]),h=this.getAttribute("component-export")||"default";if(h.includes(".")){this.Component=i;for(let m of h.split(".")){if(E.has(m)||!this.Component||typeof this.Component!="object"&&typeof this.Component!="function"||!Object.hasOwn(this.Component,m))throw new Error(`Invalid component export path: ${h}`);this.Component=this.Component[m]}}else{if(E.has(h))throw new Error(`Invalid component export path: ${h}`);this.Component=i[h]}return this.hydrator=u,this.hydrate}catch(i){return this.handleHydrationError(i),()=>{}}},e,this)}catch(r){this.handleHydrationError(r)}}attributeChangedCallback(){this.hydrate()}}l(f,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",f)}})();</script><astro-island uid="1JXHd9" prefix="r1" component-url="/_astro/Landing.CIpwbv-n.js" component-export="default" renderer-url="/_astro/client.DTojXMD-.js" props="{&quot;iconNames&quot;:[1,[[0,&quot;ableton&quot;],[0,&quot;activitypub&quot;],[0,&quot;actix&quot;],[0,&quot;adonis&quot;],[0,&quot;aftereffects&quot;],[0,&quot;aiscript&quot;],[0,&quot;alpinejs&quot;],[0,&quot;anaconda&quot;],[0,&quot;androidstudio&quot;],[0,&quot;angular&quot;],[0,&quot;ansible&quot;],[0,&quot;apollo&quot;],[0,&quot;apple&quot;],[0,&quot;appwrite&quot;],[0,&quot;arch&quot;],[0,&quot;arduino&quot;],[0,&quot;astro&quot;],[0,&quot;atom&quot;],[0,&quot;audition&quot;],[0,&quot;autocad&quot;],[0,&quot;aws&quot;],[0,&quot;azul&quot;],[0,&quot;azure&quot;],[0,&quot;babel&quot;],[0,&quot;bash&quot;],[0,&quot;bevy&quot;],[0,&quot;bitbucket&quot;],[0,&quot;blender&quot;],[0,&quot;bootstrap&quot;],[0,&quot;bsd&quot;],[0,&quot;bun&quot;],[0,&quot;c&quot;],[0,&quot;cassandra&quot;],[0,&quot;clion&quot;],[0,&quot;clojure&quot;],[0,&quot;cloudflare&quot;],[0,&quot;cmake&quot;],[0,&quot;codepen&quot;],[0,&quot;coffeescript&quot;],[0,&quot;cpp&quot;],[0,&quot;crystal&quot;],[0,&quot;cs&quot;],[0,&quot;css&quot;],[0,&quot;cypress&quot;],[0,&quot;d3&quot;],[0,&quot;dart&quot;],[0,&quot;debian&quot;],[0,&quot;deno&quot;],[0,&quot;devto&quot;],[0,&quot;discord&quot;],[0,&quot;discordbots&quot;],[0,&quot;discordjs&quot;],[0,&quot;django&quot;],[0,&quot;docker&quot;],[0,&quot;dotnet&quot;],[0,&quot;dynamodb&quot;],[0,&quot;eclipse&quot;],[0,&quot;elasticsearch&quot;],[0,&quot;electron&quot;],[0,&quot;elixir&quot;],[0,&quot;elysia&quot;],[0,&quot;emacs&quot;],[0,&quot;ember&quot;],[0,&quot;emotion&quot;],[0,&quot;expressjs&quot;],[0,&quot;fastapi&quot;],[0,&quot;fediverse&quot;],[0,&quot;figma&quot;],[0,&quot;firebase&quot;],[0,&quot;flask&quot;],[0,&quot;flutter&quot;],[0,&quot;forth&quot;],[0,&quot;fortran&quot;],[0,&quot;gamemakerstudio&quot;],[0,&quot;gatsby&quot;],[0,&quot;gcp&quot;],[0,&quot;gherkin&quot;],[0,&quot;git&quot;],[0,&quot;github&quot;],[0,&quot;githubactions&quot;],[0,&quot;gitlab&quot;],[0,&quot;gmail&quot;],[0,&quot;godot&quot;],[0,&quot;golang&quot;],[0,&quot;gradle&quot;],[0,&quot;grafana&quot;],[0,&quot;graphql&quot;],[0,&quot;gtk&quot;],[0,&quot;gulp&quot;],[0,&quot;haskell&quot;],[0,&quot;haxe&quot;],[0,&quot;haxeflixel&quot;],[0,&quot;heroku&quot;],[0,&quot;hibernate&quot;],[0,&quot;html&quot;],[0,&quot;htmx&quot;],[0,&quot;idea&quot;],[0,&quot;illustrator&quot;],[0,&quot;instagram&quot;],[0,&quot;ipfs&quot;],[0,&quot;java&quot;],[0,&quot;javascript&quot;],[0,&quot;jenkins&quot;],[0,&quot;jest&quot;],[0,&quot;jquery&quot;],[0,&quot;julia&quot;],[0,&quot;kafka&quot;],[0,&quot;kali&quot;],[0,&quot;kotlin&quot;],[0,&quot;ktor&quot;],[0,&quot;kubernetes&quot;],[0,&quot;laravel&quot;],[0,&quot;latex&quot;],[0,&quot;less&quot;],[0,&quot;linkedin&quot;],[0,&quot;linux&quot;],[0,&quot;lit&quot;],[0,&quot;lua&quot;],[0,&quot;markdown&quot;],[0,&quot;mastodon&quot;],[0,&quot;materialui&quot;],[0,&quot;matlab&quot;],[0,&quot;maven&quot;],[0,&quot;mint&quot;],[0,&quot;misskey&quot;],[0,&quot;mongodb&quot;],[0,&quot;mysql&quot;],[0,&quot;neovim&quot;],[0,&quot;nestjs&quot;],[0,&quot;netlify&quot;],[0,&quot;nextjs&quot;],[0,&quot;nginx&quot;],[0,&quot;nim&quot;],[0,&quot;nix&quot;],[0,&quot;nodejs&quot;],[0,&quot;notion&quot;],[0,&quot;npm&quot;],[0,&quot;nuxtjs&quot;],[0,&quot;obsidian&quot;],[0,&quot;ocaml&quot;],[0,&quot;octave&quot;],[0,&quot;opencv&quot;],[0,&quot;openshift&quot;],[0,&quot;openstack&quot;],[0,&quot;p5js&quot;],[0,&quot;perl&quot;],[0,&quot;photoshop&quot;],[0,&quot;php&quot;],[0,&quot;phpstorm&quot;],[0,&quot;pinia&quot;],[0,&quot;pkl&quot;],[0,&quot;plan9&quot;],[0,&quot;planetscale&quot;],[0,&quot;pnpm&quot;],[0,&quot;postgresql&quot;],[0,&quot;postman&quot;],[0,&quot;powershell&quot;],[0,&quot;premiere&quot;],[0,&quot;prisma&quot;],[0,&quot;processing&quot;],[0,&quot;prometheus&quot;],[0,&quot;pug&quot;],[0,&quot;pycharm&quot;],[0,&quot;python&quot;],[0,&quot;pytorch&quot;],[0,&quot;qt&quot;],[0,&quot;r&quot;],[0,&quot;rabbitmq&quot;],[0,&quot;rails&quot;],[0,&quot;raspberrypi&quot;],[0,&quot;react&quot;],[0,&quot;reactivex&quot;],[0,&quot;redhat&quot;],[0,&quot;redis&quot;],[0,&quot;redux&quot;],[0,&quot;regex&quot;],[0,&quot;remix&quot;],[0,&quot;replit&quot;],[0,&quot;rider&quot;],[0,&quot;robloxstudio&quot;],[0,&quot;rocket&quot;],[0,&quot;rollupjs&quot;],[0,&quot;ros&quot;],[0,&quot;ruby&quot;],[0,&quot;rust&quot;],[0,&quot;sass&quot;],[0,&quot;scala&quot;],[0,&quot;scikitlearn&quot;],[0,&quot;selenium&quot;],[0,&quot;sentry&quot;],[0,&quot;sequelize&quot;],[0,&quot;sketchup&quot;],[0,&quot;solidity&quot;],[0,&quot;solidjs&quot;],[0,&quot;spotify&quot;],[0,&quot;spring&quot;],[0,&quot;sqlite&quot;],[0,&quot;stackoverflow&quot;],[0,&quot;styledcomponents&quot;],[0,&quot;sublime&quot;],[0,&quot;supabase&quot;],[0,&quot;svelte&quot;],[0,&quot;svg&quot;],[0,&quot;swift&quot;],[0,&quot;symfony&quot;],[0,&quot;tailwindcss&quot;],[0,&quot;tauri&quot;],[0,&quot;tensorflow&quot;],[0,&quot;terraform&quot;],[0,&quot;threejs&quot;],[0,&quot;twitter&quot;],[0,&quot;typescript&quot;],[0,&quot;ubuntu&quot;],[0,&quot;unity&quot;],[0,&quot;unrealengine&quot;],[0,&quot;v&quot;],[0,&quot;vala&quot;],[0,&quot;vercel&quot;],[0,&quot;verilog&quot;],[0,&quot;vim&quot;],[0,&quot;visualstudio&quot;],[0,&quot;vite&quot;],[0,&quot;vitest&quot;],[0,&quot;vscode&quot;],[0,&quot;vscodium&quot;],[0,&quot;vuejs&quot;],[0,&quot;vuetify&quot;],[0,&quot;webassembly&quot;],[0,&quot;webflow&quot;],[0,&quot;webpack&quot;],[0,&quot;webstorm&quot;],[0,&quot;windicss&quot;],[0,&quot;windows&quot;],[0,&quot;wordpress&quot;],[0,&quot;workers&quot;],[0,&quot;xd&quot;],[0,&quot;yarn&quot;],[0,&quot;yew&quot;],[0,&quot;zig&quot;]]]}" ssr client="load" opts="{&quot;name&quot;:&quot;Landing&quot;,&quot;value&quot;:true}" await-children><div class="landing"><header class="topbar"><div class="brand"><div class="brandText"><div class="brandTitleRow"><h1 class="brandTitle">ren0va</h1><svg class="brandScribble" viewBox="0 0 220 24" aria-hidden="true" style="opacity:0"><path d="M4 18 C 42 8, 80 22, 118 14 S 192 10, 216 16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9" pathLength="1" stroke-dashoffset="0" stroke-dasharray="0 1"></path></svg></div></div></div><nav class="topActions" aria-label="Links"><a class="iconLink" href="#" aria-label="Docs" aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 4.5h9a2 2 0 0 1 2 2V20a1 1 0 0 1-1.447.894L12 18.5l-4.553 2.394A1 1 0 0 1 6 20V6.5a2 2 0 0 1 1-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path><path d="M9 8.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path><path d="M9 11.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg></a><a class="iconLink" href="https://github.com/dexisback/renova" aria-label="GitHub" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.6a9.4 9.4 0 0 0-2.97 18.32c.47.09.64-.2.64-.45v-1.64c-2.6.57-3.15-1.1-3.15-1.1-.43-1.08-1.06-1.37-1.06-1.37-.86-.57.06-.56.06-.56.95.07 1.45.98 1.45.98.85 1.45 2.23 1.03 2.78.79.09-.62.33-1.03.6-1.27-2.08-.24-4.27-1.04-4.27-4.63 0-1.02.37-1.86.98-2.52-.1-.24-.42-1.2.09-2.5 0 0 .8-.26 2.62.96a9.04 9.04 0 0 1 4.78 0c1.82-1.22 2.62-.96 2.62-.96.51 1.3.2 2.26.1 2.5.6.66.98 1.5.98 2.52 0 3.6-2.19 4.39-4.28 4.62.35.3.66.9.66 1.82v2.7c0 .25.16.55.64.45A9.4 9.4 0 0 0 12 2.6Z" fill="currentColor" opacity="0.92"></path></svg></a><a class="iconLink" href="#" aria-label="Twitter" aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18.8 7.2c.01.18.01.37.01.55 0 5.6-4.26 12.05-12.05 12.05-2.39 0-4.6-.7-6.46-1.9.33.04.66.05 1 .05 1.98 0 3.8-.67 5.25-1.8a4.24 4.24 0 0 1-3.96-2.95c.26.04.52.07.8.07.38 0 .77-.05 1.13-.15a4.23 4.23 0 0 1-3.39-4.15v-.06c.57.32 1.22.51 1.92.53a4.24 4.24 0 0 1-1.31-5.64 12.03 12.03 0 0 0 8.74 4.43 4.23 4.23 0 0 1 7.2-3.86 8.4 8.4 0 0 0 2.69-1.03 4.22 4.22 0 0 1-1.86 2.34 8.44 8.44 0 0 0 2.43-.66 9.08 9.08 0 0 1-2.12 2.2Z" fill="currentColor" opacity="0.92"></path></svg></a></nav></header><section class="urlBar" aria-label="Share"><div class="urlField" aria-label="Generated URL"><input class="urlInput" placeholder="Select icons to generate a URL…" readOnly="" aria-readonly="true" value=""/></div><button type="button" class="primaryBtn " disabled="" tabindex="0">Copy URL</button></section><section class="grid" aria-label="Generator"><div class="previewWrap"><div class="previewHeader"><div><p class="sectionLabel">Preview</p><p class="sectionTitle">Live sprite output</p></div><button type="button" class="ghostBtn" disabled="" tabindex="0">Clear</button></div><div class="previewFrame" role="img" aria-label="Icon sprite preview"><div class="previewEmpty"><div class="previewEmptyTitle">Nothing to preview</div><div class="previewEmptyHint">Pick a couple of icons on the right.</div></div></div></div><aside class="controls" aria-label="Controls"><div class="controlBlock"><div class="controlHeader"><div><p class="sectionLabel">Icons</p><p class="sectionTitle">Search &amp; select</p></div><span class="kbd" aria-hidden="true">Ctrl K</span></div><div class="searchArea"><label class="srOnly" for="_r1R_0_">Search icons</label><input id="_r1R_0_" class="input" placeholder="Search icons (react, typescript…)" value=""/></div><div class="chipRow" aria-label="Selected icon chips"><span class="muted">No icons selected.</span></div></div><div class="controlBlock"><div class="controlHeader"><div><p class="sectionLabel">Layout</p><p class="sectionTitle">Grid settings</p></div></div><div class="settingsGrid"><div class="setting"><p class="settingLabel">Icons per line</p><div class="seg"><button type="button" class="segBtn" aria-label="Decrease icons per line" tabindex="0">−</button><div class="segValue" aria-label="Icons per line value">3</div><button type="button" class="segBtn" aria-label="Increase icons per line" tabindex="0">+</button></div></div><div class="setting"><p class="settingLabel">Theme</p><div class="seg two"><button type="button" class="segBtn active" tabindex="0">Dark</button><button type="button" class="segBtn " tabindex="0">Light</button></div></div></div></div><div class="controlBlock"><div class="controlHeader"><div><p class="sectionLabel">Custom</p><p class="sectionTitle">Upload an SVG</p></div></div><div class="uploadRow"><input type="file" accept="image/svg+xml" class="srOnly" tabindex="-1"/><button type="button" class="secondaryBtn" tabindex="0">Choose file</button><div class="status idle" aria-live="polite"></div></div></div></aside></section><footer class="footer"><p class="footerText">Tip: press <span class="kbdInline">Ctrl K</span> to search icons fast.</p></footer></div><!--astro:end--></astro-island> </body></html>
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ren0va</title><meta name="description" content="Generate minimal icon grids via URL params. Pick icons, theme, and density — then share the link."><link rel="stylesheet" href="/_astro/index.MuUgoFxI.css"></head> <body> <main class="landing"> <header class="topbar"> <div class="brand"> <div class="brandText"> <div class="brandTitleRow" aria-label="ren0va"> <h1 class="brandTitle">ren0va</h1> <svg class="brandMarking" viewBox="0 0 320 64" preserveAspectRatio="none" aria-hidden="true"> <path class="markStroke markStroke1" d="M8 46 C 66 28, 132 54, 192 40 S 268 30, 312 36" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" pathLength="1"></path> <path class="markStroke markStroke2" d="M12 54 C 74 36, 138 60, 204 46 S 276 38, 316 44" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" pathLength="1"></path> </svg> </div> </div> </div> <nav class="topActions" aria-label="Links"> <a class="iconLink" href="#" aria-label="Docs" aria-disabled="true" onclick="event.preventDefault()"> <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"> <path d="M7 4.5h9a2 2 0 0 1 2 2V20a1 1 0 0 1-1.447.894L12 18.5l-4.553 2.394A1 1 0 0 1 6 20V6.5a2 2 0 0 1 1-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path> <path d="M9 8.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path> <path d="M9 11.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path> </svg> </a> <a class="iconLink" href="https://github.com/dexisback/renova" aria-label="GitHub" target="_blank" rel="noreferrer"> <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"> <path d="M12 2.6a9.4 9.4 0 0 0-2.97 18.32c.47.09.64-.2.64-.45v-1.64c-2.6.57-3.15-1.1-3.15-1.1-.43-1.08-1.06-1.37-1.06-1.37-.86-.57.06-.56.06-.56.95.07 1.45.98 1.45.98.85 1.45 2.23 1.03 2.78.79.09-.62.33-1.03.6-1.27-2.08-.24-4.27-1.04-4.27-4.63 0-1.02.37-1.86.98-2.52-.1-.24-.42-1.2.09-2.5 0 0 .8-.26 2.62.96a9.04 9.04 0 0 1 4.78 0c1.82-1.22 2.62-.96 2.62-.96.51 1.3.2 2.26.1 2.5.6.66.98 1.5.98 2.52 0 3.6-2.19 4.39-4.28 4.62.35.3.66.9.66 1.82v2.7c0 .25.16.55.64.45A9.4 9.4 0 0 0 12 2.6Z" fill="currentColor" opacity="0.92"></path> </svg> </a> <a class="iconLink" href="#" aria-label="Twitter" aria-disabled="true" onclick="event.preventDefault()"> <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"> <path d="M18.8 7.2c.01.18.01.37.01.55 0 5.6-4.26 12.05-12.05 12.05-2.39 0-4.6-.7-6.46-1.9.33.04.66.05 1 .05 1.98 0 3.8-.67 5.25-1.8a4.24 4.24 0 0 1-3.96-2.95c.26.04.52.07.8.07.38 0 .77-.05 1.13-.15a4.23 4.23 0 0 1-3.39-4.15v-.06c.57.32 1.22.51 1.92.53a4.24 4.24 0 0 1-1.31-5.64 12.03 12.03 0 0 0 8.74 4.43 4.23 4.23 0 0 1 7.2-3.86 8.4 8.4 0 0 0 2.69-1.03 4.22 4.22 0 0 1-1.86 2.34 8.44 8.44 0 0 0 2.43-.66 9.08 9.08 0 0 1-2.12 2.2Z" fill="currentColor" opacity="0.92"></path> </svg> </a> </nav> </header> <section class="urlBar" aria-label="Share"> <div class="urlField" aria-label="Generated URL"> <input id="urlInput" class="urlInput" value="" placeholder="Select icons to generate a URL…" readonly aria-readonly="true"> </div> <button id="copyBtn" type="button" class="primaryBtn" disabled>Copy URL</button> </section> <section class="grid" aria-label="Generator"> <div class="previewWrap"> <div class="previewHeader"> <div> <p class="sectionLabel">Preview</p> <p class="sectionTitle">Live sprite output</p> </div> <button id="clearBtn" type="button" class="ghostBtn" disabled>Clear</button> </div> <div class="previewFrame" role="img" aria-label="Icon sprite preview"> <img id="previewImg" class="previewImage" src="" alt="" style="display:none"> <div id="previewEmpty" class="previewEmpty"> <div class="previewEmptyTitle">Nothing to preview</div> <div class="previewEmptyHint">Pick a couple of icons on the right.</div> </div> </div> </div> <aside class="controls" aria-label="Controls"> <div class="controlBlock"> <div class="controlHeader"> <div> <p class="sectionLabel">Icons</p> <p class="sectionTitle">Search & select</p> </div> <span class="kbd" aria-hidden="true">Ctrl K</span> </div> <div class="searchArea" id="searchArea"> <label class="srOnly" for="searchInput">Search icons</label> <input id="searchInput" class="input" placeholder="Search icons (react, typescript…)" autocomplete="off"> <div id="dropdown" class="dropdown" role="listbox" aria-label="Search results" style="display:none"></div> </div> <div id="chipRow" class="chipRow" aria-label="Selected icon chips"> <span class="muted">No icons selected.</span> </div> </div> <div class="controlBlock"> <div class="controlHeader"> <div> <p class="sectionLabel">Layout</p> <p class="sectionTitle">Grid settings</p> </div> </div> <div class="settingsGrid"> <div class="setting"> <p class="settingLabel">Icons per line</p> <div class="seg"> <button id="perDec" type="button" class="segBtn" aria-label="Decrease icons per line">−</button> <div id="perValue" class="segValue" aria-label="Icons per line value">3</div> <button id="perInc" type="button" class="segBtn" aria-label="Increase icons per line">+</button> </div> </div> <div class="setting"> <p class="settingLabel">Theme</p> <div class="seg two"> <button id="themeDark" type="button" class="segBtn active">Dark</button> <button id="themeLight" type="button" class="segBtn">Light</button> </div> </div> </div> </div> <div class="controlBlock"> <div class="controlHeader"> <div> <p class="sectionLabel">Custom</p> <p class="sectionTitle">Upload an SVG</p> </div> </div> <div class="uploadRow"> <input id="fileInput" type="file" accept="image/svg+xml" class="srOnly" tabindex="-1"> <button id="chooseFile" type="button" class="secondaryBtn">Choose file</button> <div id="uploadStatus" class="status idle" aria-live="polite"></div> </div> </div> </aside> </section> <footer class="footer"> <p class="footerText">
+Tip: press <span class="kbdInline">Ctrl K</span> to search icons fast.
+</p> </footer> </main> <script>(function(){const iconNames = ["ableton","activitypub","actix","adonis","aftereffects","aiscript","alpinejs","anaconda","androidstudio","angular","ansible","apollo","apple","appwrite","arch","arduino","astro","atom","audition","autocad","aws","azul","azure","babel","bash","bevy","bitbucket","blender","bootstrap","bsd","bun","c","cassandra","clion","clojure","cloudflare","cmake","codepen","coffeescript","cpp","crystal","cs","css","cypress","d3","dart","debian","deno","devto","discord","discordbots","discordjs","django","docker","dotnet","dynamodb","eclipse","elasticsearch","electron","elixir","elysia","emacs","ember","emotion","expressjs","fastapi","fediverse","figma","firebase","flask","flutter","forth","fortran","gamemakerstudio","gatsby","gcp","gherkin","git","github","githubactions","gitlab","gmail","godot","golang","gradle","grafana","graphql","gtk","gulp","haskell","haxe","haxeflixel","heroku","hibernate","html","htmx","idea","illustrator","instagram","ipfs","java","javascript","jenkins","jest","jquery","julia","kafka","kali","kotlin","ktor","kubernetes","laravel","latex","less","linkedin","linux","lit","lua","markdown","mastodon","materialui","matlab","maven","mint","misskey","mongodb","mysql","neovim","nestjs","netlify","nextjs","nginx","nim","nix","nodejs","notion","npm","nuxtjs","obsidian","ocaml","octave","opencv","openshift","openstack","p5js","perl","photoshop","php","phpstorm","pinia","pkl","plan9","planetscale","pnpm","postgresql","postman","powershell","premiere","prisma","processing","prometheus","pug","pycharm","python","pytorch","qt","r","rabbitmq","rails","raspberrypi","react","reactivex","redhat","redis","redux","regex","remix","replit","rider","robloxstudio","rocket","rollupjs","ros","ruby","rust","sass","scala","scikitlearn","selenium","sentry","sequelize","sketchup","solidity","solidjs","spotify","spring","sqlite","stackoverflow","styledcomponents","sublime","supabase","svelte","svg","swift","symfony","tailwindcss","tauri","tensorflow","terraform","threejs","twitter","typescript","ubuntu","unity","unrealengine","v","vala","vercel","verilog","vim","visualstudio","vite","vitest","vscode","vscodium","vuejs","vuetify","webassembly","webflow","webpack","webstorm","windicss","windows","wordpress","workers","xd","yarn","yew","zig"];
+
+      const ICONS = iconNames
+      const SEARCH_LIMIT = 12
+
+      let selectedIcons = []
+      let customIcons = []
+      let theme = "dark"
+      let perLine = 3
+      let query = ""
+      let highlightedIndex = 0
+      let searchOpen = false
+      let copyTimeout = null
+      let uploadClearTimeout = null
+
+      const el = {
+        urlInput: document.getElementById("urlInput"),
+        copyBtn: document.getElementById("copyBtn"),
+        clearBtn: document.getElementById("clearBtn"),
+        previewImg: document.getElementById("previewImg"),
+        previewEmpty: document.getElementById("previewEmpty"),
+        searchArea: document.getElementById("searchArea"),
+        searchInput: document.getElementById("searchInput"),
+        dropdown: document.getElementById("dropdown"),
+        chipRow: document.getElementById("chipRow"),
+        perDec: document.getElementById("perDec"),
+        perInc: document.getElementById("perInc"),
+        perValue: document.getElementById("perValue"),
+        themeDark: document.getElementById("themeDark"),
+        themeLight: document.getElementById("themeLight"),
+        fileInput: document.getElementById("fileInput"),
+        chooseFile: document.getElementById("chooseFile"),
+        uploadStatus: document.getElementById("uploadStatus"),
+      }
+
+      function buildUrl() {
+        const icons = [...selectedIcons, ...customIcons]
+        if (icons.length === 0) return ""
+        const url = new URL("/icons", window.location.origin)
+        url.searchParams.set("i", icons.join(","))
+        url.searchParams.set("theme", theme)
+        url.searchParams.set("perline", String(perLine))
+        return url.toString()
+      }
+
+      function setSearchOpen(next) {
+        searchOpen = next
+        el.dropdown.style.display = searchOpen ? "block" : "none"
+        if (searchOpen) {
+          renderDropdown()
+        }
+      }
+
+      function getFilteredIcons() {
+        const q = query.trim().toLowerCase()
+        const base = q ? ICONS.filter((name) => name.includes(q)) : ICONS
+        return base.slice(0, SEARCH_LIMIT)
+      }
+
+      function renderDropdown() {
+        const filtered = getFilteredIcons()
+        highlightedIndex = Math.min(highlightedIndex, Math.max(filtered.length - 1, 0))
+
+        if (filtered.length === 0) {
+          el.dropdown.innerHTML = '<div class="dropdownEmpty">No results.</div>'
+          return
+        }
+
+        el.dropdown.innerHTML = filtered
+          .map((name, idx) => {
+            const active = idx === highlightedIndex ? "active" : ""
+            const selected = selectedIcons.includes(name) ? "selected" : ""
+            const hint = selected ? "Selected" : "Add"
+            return `<button type="button" class="option ${active} ${selected}" data-icon="${name}" role="option" aria-selected="${selected}">
+              <span class="optionName">${name}</span>
+              <span class="optionHint">${hint}</span>
+            </button>`
+          })
+          .join("")
+
+        el.dropdown.querySelectorAll("button.option").forEach((btn, idx) => {
+          btn.addEventListener("mouseenter", () => {
+            highlightedIndex = idx
+            renderDropdown()
+          })
+          btn.addEventListener("mousedown", (e) => e.preventDefault())
+          btn.addEventListener("click", () => {
+            toggleIcon(btn.dataset.icon)
+          })
+        })
+      }
+
+      function renderChips() {
+        if (selectedIcons.length === 0) {
+          el.chipRow.innerHTML = '<span class="muted">No icons selected.</span>'
+          return
+        }
+
+        const chips = selectedIcons
+          .slice(0, 18)
+          .map(
+            (name) =>
+              `<button type="button" class="chip" data-icon="${name}" aria-label="Remove ${name}">${name}<span class="chipX" aria-hidden="true">×</span></button>`
+          )
+          .join("")
+        el.chipRow.innerHTML = chips
+        el.chipRow.querySelectorAll("button.chip").forEach((btn) => {
+          btn.addEventListener("click", () => toggleIcon(btn.dataset.icon))
+        })
+      }
+
+      function updatePreview() {
+        const url = buildUrl()
+        el.urlInput.value = url
+        el.copyBtn.disabled = !url
+        el.clearBtn.disabled = selectedIcons.length === 0 && customIcons.length === 0
+
+        if (!url) {
+          el.previewImg.style.display = "none"
+          el.previewImg.src = ""
+          el.previewEmpty.style.display = "grid"
+          return
+        }
+
+        el.previewEmpty.style.display = "none"
+        el.previewImg.style.display = "block"
+        el.previewImg.src = url
+      }
+
+      function toggleIcon(icon) {
+        if (!icon) return
+        if (selectedIcons.includes(icon)) {
+          selectedIcons = selectedIcons.filter((v) => v !== icon)
+        } else {
+          selectedIcons.push(icon)
+        }
+        renderDropdown()
+        renderChips()
+        updatePreview()
+      }
+
+      function clearAll() {
+        selectedIcons = []
+        customIcons = []
+        query = ""
+        highlightedIndex = 0
+        el.searchInput.value = ""
+        setSearchOpen(false)
+        el.uploadStatus.textContent = ""
+        el.uploadStatus.className = "status idle"
+        updatePreview()
+        renderChips()
+      }
+
+      function stepPerLine(delta) {
+        const next = Math.min(10, Math.max(1, perLine + delta))
+        perLine = next
+        el.perValue.textContent = String(perLine)
+        updatePreview()
+      }
+
+      function setTheme(next) {
+        theme = next === "light" ? "light" : "dark"
+        el.themeDark.classList.toggle("active", theme === "dark")
+        el.themeLight.classList.toggle("active", theme === "light")
+        updatePreview()
+      }
+
+      async function onCopy() {
+        const url = buildUrl()
+        if (!url) return
+        try {
+          await navigator.clipboard.writeText(url)
+          el.copyBtn.textContent = "Copied"
+          el.copyBtn.classList.add("btnOk")
+          if (copyTimeout) window.clearTimeout(copyTimeout)
+          copyTimeout = window.setTimeout(() => {
+            el.copyBtn.textContent = "Copy URL"
+            el.copyBtn.classList.remove("btnOk")
+          }, 1800)
+        } catch {}
+      }
+
+      async function handleUpload(file) {
+        if (!file || file.type !== "image/svg+xml") {
+          el.uploadStatus.textContent = "Only SVG files allowed."
+          el.uploadStatus.className = "status error"
+          return
+        }
+
+        el.uploadStatus.textContent = "Uploading…"
+        el.uploadStatus.className = "status idle"
+        const formData = new FormData()
+        formData.append("file", file)
+
+        try {
+          const res = await fetch("/custom-icons/upload", { method: "POST", body: formData })
+          if (!res.ok) {
+            el.uploadStatus.textContent = `Upload failed (${res.status}).`
+            el.uploadStatus.className = "status error"
+            return
+          }
+          const data = await res.json()
+          if (!data || !data.objectPath) {
+            el.uploadStatus.textContent = "Bad upload response."
+            el.uploadStatus.className = "status error"
+            return
+          }
+
+          customIcons.push(`custom:${data.objectPath}`)
+          el.uploadStatus.textContent = "Uploaded."
+          el.uploadStatus.className = "status ok"
+          updatePreview()
+
+          if (uploadClearTimeout) window.clearTimeout(uploadClearTimeout)
+          uploadClearTimeout = window.setTimeout(() => {
+            if (el.uploadStatus.textContent === "Uploaded.") {
+              el.uploadStatus.textContent = ""
+              el.uploadStatus.className = "status idle"
+            }
+          }, 2400)
+        } catch {
+          el.uploadStatus.textContent = "Upload error."
+          el.uploadStatus.className = "status error"
+        }
+      }
+
+      el.searchInput.addEventListener("input", () => {
+        query = el.searchInput.value
+        highlightedIndex = 0
+        setSearchOpen(true)
+        renderDropdown()
+      })
+
+      el.searchInput.addEventListener("focus", () => setSearchOpen(true))
+
+      el.searchInput.addEventListener("keydown", (event) => {
+        const filtered = getFilteredIcons()
+        if (event.key === "ArrowDown") {
+          event.preventDefault()
+          highlightedIndex = Math.min(highlightedIndex + 1, Math.max(filtered.length - 1, 0))
+          renderDropdown()
+        } else if (event.key === "ArrowUp") {
+          event.preventDefault()
+          highlightedIndex = Math.max(highlightedIndex - 1, 0)
+          renderDropdown()
+        } else if (event.key === "Enter" && filtered[highlightedIndex]) {
+          event.preventDefault()
+          toggleIcon(filtered[highlightedIndex])
+        } else if (event.key === "Escape") {
+          setSearchOpen(false)
+        }
+      })
+
+      document.addEventListener("keydown", (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+          event.preventDefault()
+          setSearchOpen(true)
+          el.searchInput.focus()
+          el.searchInput.select()
+        } else if (event.key === "Escape") {
+          setSearchOpen(false)
+        }
+      })
+
+      document.addEventListener("pointerdown", (event) => {
+        if (!searchOpen) return
+        if (el.searchArea.contains(event.target)) return
+        setSearchOpen(false)
+      })
+
+      el.copyBtn.addEventListener("click", onCopy)
+      el.clearBtn.addEventListener("click", clearAll)
+      el.perDec.addEventListener("click", () => stepPerLine(-1))
+      el.perInc.addEventListener("click", () => stepPerLine(1))
+      el.themeDark.addEventListener("click", () => setTheme("dark"))
+      el.themeLight.addEventListener("click", () => setTheme("light"))
+      el.chooseFile.addEventListener("click", () => el.fileInput.click())
+      el.fileInput.addEventListener("change", (event) => {
+        const file = event.target.files && event.target.files[0]
+        if (file) handleUpload(file)
+        event.target.value = ""
+      })
+
+      renderChips()
+      updatePreview()
+    })();</script> </body> </html>
