@@ -161,11 +161,37 @@ body::after {
   background: transparent;
   color: var(--muted);
   text-decoration: none;
+  position: relative;
   transition:
     color 160ms ease,
     border-color 160ms ease,
     background-color 160ms ease,
     transform 160ms ease;
+}
+
+.iconLink::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  background: #1a1b26;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 120ms ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+}
+
+.iconLink:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .iconLink svg {
