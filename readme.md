@@ -1,3 +1,11 @@
+```text
+                _                              
+   _____ ___   / | / / ____ _   __ ____ _
+  / ___// _ \ /  |/ // __ \ | / // __ `/ 
+ / /   /  __// /|  // /_/ / |/ // /_/ /  
+/_/    \___//_/ |_/ \____/|___/ \__,_/   
+```
+
 # Ren0va
 
 Lightning-fast, exhaustive skill icons for your GitHub profile and READMEs.
@@ -52,47 +60,65 @@ If an icon is missing or you need a personal branding element, Ren0va supports c
 
 ### System Architecture
 
-Ren0va is built for speed and efficiency, shifting expensive operations to build time and utilizing edge compute for runtime rendering.
+Ren0va is designed for maximum throughput and minimal runtime latency. The architecture is split between a heavy build pipeline and a zero-dependency edge runtime.
 
 ```mermaid
 graph TD
-    subgraph Build Time
-        A[Raw SVGs /icons/raw] --> B[scripts/process.ts]
-        B --> C[Processed Tiles /icons/processed-svg]
-        C --> D[scripts/build.ts]
-        D --> E[icons.json]
+    subgraph Local Build Pipeline
+        R[Raw SVGs /icons/raw-svg] --> P[scripts/process.ts]
+        P -- Normalize/Scale/Tile --> PS[Processed SVGs /icons/processed-svg]
+        PS --> B[scripts/build.ts]
+        B -- Stringify/Map --> IJ[icons.json - In-memory Bundle]
+        A[landing.ts / landing.css] --> E[scripts/embed-landing.ts]
+        E -- Pure Inline Injection --> LA[src/landing-assets.ts]
     end
 
     subgraph Runtime - Cloudflare Worker
-        F[Request Received] --> G[src/worker.ts]
-        G --> H[src/fuzzy.ts - Levenshtein Match]
-        H --> I[src/icons.ts - Alias & Theme Resolution]
-        I --> J{Default or Custom?}
-        J -- Default --> K[Lookup in icons.json]
-        J -- Custom --> L[Fetch from Supabase S3]
-        K --> M[src/generate.ts - SVG Stitching]
-        L --> M
-        M --> N[Final SVG Response]
+        REQ[Incoming GET /icons] --> W[src/worker.ts]
+        W -- Typo Correction --> FS[src/fuzzy.ts - Levenshtein]
+        FS -- Resolution/Alias --> IT[src/icons.ts]
+        IT --> TYPE{Icon Type}
+        TYPE -- Built-in --> K[Lookup icons.json Map]
+        TYPE -- Custom --> S3[Supabase Storage Fetch]
+        K --> G[src/generate.ts]
+        S3 --> G
+        G -- Grid Calculation/SVG Stitching --> RES[Final SVG Response]
     end
 
-    subgraph Storage
-        L -.-> O[Supabase Storage Bucket]
+    subgraph Security Layer
+        S3 -.-> SEC[Server-Side Signed URLs]
+        SEC -.-> AUTH[Supabase Auth Service]
     end
 ```
 
 ### Technical Highlights
--   **Fuzzy Search:** Uses the Levenshtein distance algorithm in `src/fuzzy.ts` to correct typos in URL parameters (e.g., `typscript` → `typescript`) without breaking the image render.
--   **Performance-First Build:** `icons.json` is generated at build time, containing all default SVG strings. This allows the Worker to perform O(1) lookups in memory, avoiding filesystem or database hits for default icons.
--   **Edge Compute:** Hosted on Cloudflare Workers. Cold starts are non-existent, and the logic runs at the edge nearest to the user.
--   **Lightweight Frontend:** The landing page is built with Astro. It uses zero-dependency vanilla JS and CSS, ensuring a near-instant Load Time and high Lighthouse scores. No heavy React islands are used in the final build.
--   **Theming:** Every icon is processed into dark (#1e1e2e) and light (#ffffff) variants. The API intelligently falls back and resolves themes based on the `theme` parameter.
+
+-   **Server-Side Secret Management:** Unlike typical client-side implementations, Ren0va handles all communication with Supabase on the server side (Cloudflare Worker). Secure credentials and signed-url logic never touch the client browser, preventing token exposure and ensuring that custom icon fetching is strictly controlled.
+-   **Fuzzy Matching (Levenshtein Distance):** The `src/fuzzy.ts` module implements the Levenshtein distance algorithm to handle typos. If a user requests `typscript`, the system resolves it to `typescript` in O(n) time against the icon map, preventing broken image renders.
+-   **Atomic Build System:** The project uses a multi-stage build process. `process.ts` standardizes raw SVGs into 48x48 tiles with consistent padding and corner radii, while `build.ts` compiles these into a single `icons.json` to eliminate filesystem I/O at runtime.
+-   **Pure Inline Performance:** To achieve near-zero Cumulative Layout Shift (CLS) and instant interaction on the landing page, `scripts/embed-landing.ts` injects critical assets directly into the build. The frontend uses explicitly vanilla CSS and inline JS—no heavy frameworks or hydration cycles.
+-   **Theme Fallback Engine:** The `resolveIcon` logic handles dark/light variant resolution with intelligent fallbacks, ensuring that if a specific theme variant is missing, a legible alternative is served without error.
 
 ### Tech Stack
--   **Runtime:** Cloudflare Workers (Edge Runtime)
--   **Language:** TypeScript
--   **Framework:** Astro (Static Site Generation)
--   **Storage:** Supabase (S3-compatible bucket for custom icons)
--   **Deployment:** Wrangler CLI
+-   **Compute:** Cloudflare Workers (V8 Edge Runtime)
+-   **Logic:** TypeScript (Strict Mode)
+-   **UI:** Astro (Zero-JS by default) + Vanilla CSS
+-   **Storage:** Supabase (S3-compatible Object Storage for custom assets)
+-   **Tooling:** Wrangler, TSX, Levenshtein-algo
+
+### Project Scripts
+
+
+
+| Script | Command | Description |
+| :--- | :--- | :--- |
+| `dev` | `npm run dev` | Starts the Wrangler local development server for the Worker. |
+| `process` | `npm run process` | Normalizes and tiles all SVGs in `icons/raw-svg/` into `icons/processed-svg/`. |
+| `build:icons`| `npm run build:icons` | Scans processed SVGs and generates the `icons.json` manifest. |
+| `build:astro`| `npm run build:astro` | Compiles the Astro landing page. |
+| `build:embed`| `npm run build:embed` | Injects landing page assets into the source for inline delivery. |
+| `build` | `npm run build` | Orchestrates the entire pipeline (Icons → Astro → Embed). |
+| `deploy` | `npm run deploy` | Full build followed by deployment to Cloudflare production. |
 
 ### Local Setup
 
@@ -107,19 +133,13 @@ graph TD
     npm install
     ```
 
-3.  **Process new icons:**
-    If you add new SVGs to `icons/raw-svg/`, run:
-    ```bash
-    npm run process
-    npm run build
-    ```
-
-4.  **Local development:**
+3.  **Local Development:**
     ```bash
     npm run dev
     ```
 
-5.  **Deployment:**
+4.  **Deployment:**
+    *(Requires Cloudflare Authentication)*
     ```bash
     npm run deploy
     ```
@@ -132,4 +152,4 @@ Both are stored in `public/fonts/` and serve as the visual backbone of the Ren0v
 
 ---
 
-Built with precision by [Amaan](https://github.com/dexisback).
+Built with ❣️ by [**@dextertwts/amaan**](https://github.com/dexisback).
