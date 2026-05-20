@@ -39,7 +39,7 @@ For professional centering in your GitHub profile, use the HTML snippet:
 Visit [ren0va.amaanworks.me](https://ren0va.amaanworks.me) to browse the full library.
 - Use the interactive selector to pick your skills.
 - Customize the theme (Light/Dark) and the layout (Icons per line).
-- Copy the generated string or markdown snippet and paste it directly into your GitHub README.
+- Copy the generated `<img>` tag and paste it directly into your GitHub README for instant integration.
 
 ### Available Icons
 Ren0va ships with an exhaustive set of default icons. Below is a categorized sample of available identifiers (case-insensitive):

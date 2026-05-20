@@ -122,7 +122,8 @@ Tip: press <span class="kbdInline">Ctrl K</span> to search icons fast.
 
       function updatePreview() {
         const url = buildUrl()
-        el.urlInput.value = url
+        const imgTag = url ? `<img src="\${url}" />` : ""
+        el.urlInput.value = imgTag
         el.copyBtn.disabled = !url
         el.clearBtn.disabled = selectedIcons.length === 0 && customIcons.length === 0
 
@@ -180,8 +181,9 @@ Tip: press <span class="kbdInline">Ctrl K</span> to search icons fast.
       async function onCopy() {
         const url = buildUrl()
         if (!url) return
+        const imgTag = `<img src="\${url}" />`
         try {
-          await navigator.clipboard.writeText(url)
+          await navigator.clipboard.writeText(imgTag)
           el.copyBtn.textContent = "Copied"
           el.copyBtn.classList.add("btnOk")
           if (copyTimeout) window.clearTimeout(copyTimeout)
