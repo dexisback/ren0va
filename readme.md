@@ -27,6 +27,14 @@ Construct a URL with the icons you need, separated by commas.
 ![My Skills](https://ren0va.amaanworks.me/icons?i=react,typescript,supabase,cloudflare,astro&theme=dark&perline=5)
 ```
 
+For professional centering in your GitHub profile, use the HTML snippet:
+
+```html
+<p align="center">
+  <img src="https://ren0va.amaanworks.me/icons?i=react,typescript,supabase,cloudflare,astro&theme=dark&perline=5" alt="My Skills" />
+</p>
+```
+
 #### 2. The Landing Page
 Visit [ren0va.amaanworks.me](https://ren0va.amaanworks.me) to browse the full library.
 - Use the interactive selector to pick your skills.

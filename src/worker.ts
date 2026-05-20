@@ -217,6 +217,9 @@ function handleLandingAsset(pathname: string): Response {
 }
 
 async function handleUpload(request: Request, env: Env): Promise<Response> {
+  const startTotal = performance.now()
+  const timings: string[] = []
+
   try {
     const form = await request.formData()
     const file = form.get("file")
@@ -229,11 +232,13 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
       return jsonResponse({ error: validationError }, 400)
     }
 
+    const startSanitize = performance.now()
     const rawSvg = await file.text()
     const sanitized = sanitizeAndNormalizeSvg(rawSvg)
     if (!sanitized.svg) {
       return jsonResponse({ error: "invalid_svg", reason: sanitized.reason ?? "unknown" }, 400)
     }
+    timings.push(`sanitize;dur=${(performance.now() - startSanitize).toFixed(2)}`)
 
     const rawName = file.name || "custom"
     const dotIndex = rawName.lastIndexOf(".")
@@ -247,7 +252,7 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
       return jsonResponse({ error: "server misconfigured" }, 500)
     }
 
-    
+    const startUpload = performance.now()
     //NOTE: direct service trip from supabase to worker (No signed URL round-trip needed)
     const baseUrl = trimTrailingSlash(env.SUPABASE_URL)
     const uploadUrl = `${baseUrl}/storage/v1/object/icons/${encodeURIComponent(objectPath)}.svg`
@@ -266,8 +271,18 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
       const detail = await uploadRes.text()
       return jsonResponse({ error: "upload_failed", detail }, 502)
     }
+    timings.push(`upload;dur=${(performance.now() - startUpload).toFixed(2)}`)
 
-    return jsonResponse({ objectPath })
+    timings.push(`total;dur=${(performance.now() - startTotal).toFixed(2)}`)
+
+    return new Response(JSON.stringify({ objectPath }), {
+      status: 200,
+      headers: {
+        ...CORS_HEADERS,
+        "Content-Type": "application/json",
+        "Server-Timing": timings.join(", "),
+      },
+    })
   } catch (error) {
     const message = error instanceof Error ? error.message : "bad request"
     return jsonResponse({ error: "bad_request", message }, 400)
@@ -275,6 +290,9 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
 }
 
 async function handleIcons(url: URL, env: Env): Promise<Response> {
+  const startTotal = performance.now()
+  const timings: string[] = []
+
   const raw = url.searchParams.get("i") ?? ""
   if (!raw) {
     return textResponse("missing ?i=param", 400)
@@ -284,6 +302,7 @@ async function handleIcons(url: URL, env: Env): Promise<Response> {
   const perLine = parsePerLine(url.searchParams.get("perline"))
   const names = splitCsv(raw)
 
+  const startResolve = performance.now()
   const svgs: string[] = []
   for (const name of names) {
     const svg = await resolveSvg(name, env, theme)
@@ -291,17 +310,24 @@ async function handleIcons(url: URL, env: Env): Promise<Response> {
       svgs.push(svg)
     }
   }
+  timings.push(`resolve;dur=${(performance.now() - startResolve).toFixed(2)}`)
 
   if (svgs.length === 0) {
     return textResponse("no valid icons found", 400)
   }
 
+  const startGenerate = performance.now()
   const output = generateSvg(svgs, perLine)
+  timings.push(`generate;dur=${(performance.now() - startGenerate).toFixed(2)}`)
+
+  timings.push(`total;dur=${(performance.now() - startTotal).toFixed(2)}`)
+
   return new Response(output, {
     headers: {
       "Content-Type": "image/svg+xml",
       "Cache-Control": "public, max-age=3600",
       "Access-Control-Allow-Origin": "*",
+      "Server-Timing": timings.join(", "),
     },
   })
 }
