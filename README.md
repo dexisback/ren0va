@@ -10,7 +10,7 @@
 
 Lightning-fast, exhaustive skill icons for your GitHub profile and READMEs.
 
-Ren0va provides a high-performance HTTP API to generate stitched SVG grids of developer tool icons. It serves as a superior alternative to existing solutions like [skillicons.dev](https://skillicons.dev), offering a more exhaustive, frequently updated icon set and the ability to serve custom user-uploaded SVGs at scale.
+Ren0va provides a high-performance HTTP API to generate stitched SVG grids of developer tool icons. It serves as a performant and flexible alternative to existing skill-sharing tools, offering an exhaustive icon set and the ability to serve custom user-uploaded SVGs at scale.
 
 ---
 
@@ -184,6 +184,8 @@ A huge thanks to the creators of the open-source fonts used in this project:
 -   **Soria:** A beautiful, modern serif font.
 -   **Skyscrapers:** Used for high-impact typography.
 Both are stored in `public/fonts/` and serve as the visual backbone of the Ren0va brand.
+
+Special thanks to [**skillicons.dev**](https://skillicons.dev). Many of the default icons in this library were sourced from their repository under fair use, providing the foundational set for our exhaustive library.
 
 ---
 
