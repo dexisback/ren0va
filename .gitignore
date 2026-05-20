@@ -14,3 +14,4 @@ skills-lock.json
 .agents/*
 .astro
 dist-astro/*
+.agents/skills/*
