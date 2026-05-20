@@ -492,6 +492,8 @@ body::after {
   background: rgba(255, 255, 255, 0.96);
   box-shadow: var(--shadow-2);
   overflow: hidden;
+  max-height: 280px;
+  overflow-y: auto;
   z-index: 10;
 }
 

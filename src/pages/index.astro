@@ -193,7 +193,6 @@ const iconNames = [
 
     <script define:vars={{ iconNames }}>
       const ICONS = iconNames
-      const SEARCH_LIMIT = 12
 
       let selectedIcons = []
       let customIcons = []
@@ -245,8 +244,7 @@ const iconNames = [
 
       function getFilteredIcons() {
         const q = query.trim().toLowerCase()
-        const base = q ? ICONS.filter((name) => name.includes(q)) : ICONS
-        return base.slice(0, SEARCH_LIMIT)
+        return q ? ICONS.filter((name) => name.includes(q)) : ICONS
       }
 
       function renderDropdown() {
@@ -263,24 +261,31 @@ const iconNames = [
             const active = idx === highlightedIndex ? "active" : ""
             const selected = selectedIcons.includes(name) ? "selected" : ""
             const hint = selected ? "Selected" : "Add"
-            return `<button type="button" class="option ${active} ${selected}" data-icon="${name}" role="option" aria-selected="${selected}">
+            return `<button type="button" class="option ${active} ${selected}" data-icon="${name}" data-index="${idx}" role="option" aria-selected="${selected}">
               <span class="optionName">${name}</span>
               <span class="optionHint">${hint}</span>
             </button>`
           })
           .join("")
-
-        el.dropdown.querySelectorAll("button.option").forEach((btn, idx) => {
-          btn.addEventListener("mouseenter", () => {
-            highlightedIndex = idx
-            renderDropdown()
-          })
-          btn.addEventListener("mousedown", (e) => e.preventDefault())
-          btn.addEventListener("click", () => {
-            toggleIcon(btn.dataset.icon)
-          })
-        })
       }
+
+      el.dropdown.addEventListener("mouseover", (e) => {
+        const btn = e.target.closest("button.option")
+        if (!btn) return
+        const idx = Number(btn.dataset.index)
+        if (idx !== highlightedIndex) {
+          highlightedIndex = idx
+          renderDropdown()
+        }
+      })
+
+      el.dropdown.addEventListener("click", (e) => {
+        const btn = e.target.closest("button.option")
+        if (!btn) return
+        e.preventDefault()
+        e.stopPropagation()
+        toggleIcon(btn.dataset.icon)
+      })
 
       function renderChips() {
         if (selectedIcons.length === 0) {
