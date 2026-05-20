@@ -107,6 +107,33 @@ graph TD
 -   **Pure Inline Performance:** To achieve near-zero Cumulative Layout Shift (CLS) and instant interaction on the landing page, `scripts/embed-landing.ts` injects critical assets directly into the build. The frontend uses explicitly vanilla CSS and inline JS—no heavy frameworks or hydration cycles.
 -   **Theme Fallback Engine:** The `resolveIcon` logic handles dark/light variant resolution with intelligent fallbacks, ensuring that if a specific theme variant is missing, a legible alternative is served without error.
 
+### Performance & Benchmarks
+
+Below are the real-world performance numbers gathered from the production environment using the built-in `Server-Timing` headers and k6 load testing.
+
+#### Internal Execution (Server-Timing)
+
+| Request Type | Internal Logic (`resolve`) | Grid Generation (`generate`) | Total Worker Runtime |
+| :--- | :--- | :--- | :--- |
+| **Default Icons** | < 0.01ms | < 0.01ms | **0.00ms*** |
+| **Custom Icons** | ~650ms (S3 Fetch) | < 0.01ms | ~650ms |
+
+*\*Note: 0.00ms indicates the logic is executed entirely in-memory at the edge, finishing faster than the system's high-resolution timer can increment.*
+
+#### Scalability & Throughput (k6 Load Test)
+
+high-concurrency load test was performed using `k6` against the production edge endpoint:
+
+| Metric | Result |
+| :--- | :--- |
+| **Success Rate** | 100% (Zero Failures) |
+| **Total Requests** | 1,395 (over 30 seconds) |
+| **Average Latency** | 113ms |
+| **P95 Latency** | 124ms |
+| **Throughput** | ~46.2 reqs/sec (10 Concurrent VUs) |
+
+
+
 ### Tech Stack
 -   **Compute:** Cloudflare Workers (V8 Edge Runtime)
 -   **Logic:** TypeScript (Strict Mode)
