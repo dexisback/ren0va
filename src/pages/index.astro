@@ -94,7 +94,7 @@ const iconNames = [
       </header>
 
       <section class="urlBar" aria-label="Share">
-        <div class="urlField" aria-label="Generated URL">
+        <div id="urlField" class="urlField" aria-label="Generated URL">
           <input id="urlInput" class="urlInput" value="" placeholder="Select icons to generate a URL…" readonly aria-readonly="true" />
         </div>
         <button id="copyBtn" type="button" class="primaryBtn" disabled>Copy URL</button>
@@ -160,8 +160,8 @@ const iconNames = [
               <div class="setting">
                 <p class="settingLabel">Theme</p>
                 <div class="seg two">
-                  <button id="themeDark" type="button" class="segBtn active">Dark</button>
-                  <button id="themeLight" type="button" class="segBtn">Light</button>
+                  <button id="themeDark" type="button" class="segBtn active" aria-pressed="true">Dark</button>
+                  <button id="themeLight" type="button" class="segBtn" aria-pressed="false">Light</button>
                 </div>
               </div>
             </div>
@@ -205,6 +205,7 @@ const iconNames = [
       let uploadClearTimeout = null
 
       const el = {
+        urlField: document.getElementById("urlField"),
         urlInput: document.getElementById("urlInput"),
         copyBtn: document.getElementById("copyBtn"),
         clearBtn: document.getElementById("clearBtn"),
@@ -311,6 +312,7 @@ const iconNames = [
         const imgTag = url ? `<img src="${url}" />` : ""
         el.urlInput.value = imgTag
         el.copyBtn.disabled = !url
+        el.urlField.classList.toggle("disabled", !url)
         el.clearBtn.disabled = selectedIcons.length === 0 && customIcons.length === 0
 
         if (!url) {
@@ -361,6 +363,8 @@ const iconNames = [
         theme = next === "light" ? "light" : "dark"
         el.themeDark.classList.toggle("active", theme === "dark")
         el.themeLight.classList.toggle("active", theme === "light")
+        el.themeDark.setAttribute("aria-pressed", theme === "dark" ? "true" : "false")
+        el.themeLight.setAttribute("aria-pressed", theme === "light" ? "true" : "false")
         updatePreview()
       }
 
