@@ -30,6 +30,24 @@ if (fs.existsSync(astroDir)) {
   }
 }
 
+// Also embed root-level static assets from public/ (favicon, images, etc.)
+// Astro copies these into dist-astro/ at build time.
+const distRoot = path.join(process.cwd(), "dist-astro")
+for (const fileName of fs.readdirSync(distRoot)) {
+  const filePath = path.join(distRoot, fileName)
+  if (!fs.statSync(filePath).isFile()) continue
+  if (fileName === "index.html") continue
+  if (fileName === "_headers") continue
+  if (fileName === "_redirects") continue
+  if (fileName === "_routes.json") continue
+
+  const urlPath = `/${fileName}`
+  const encoding = contentEncodingForFile(fileName)
+  const buf = fs.readFileSync(filePath)
+  const data = encoding === "utf8" ? buf.toString("utf8") : buf.toString("base64")
+  assetEntries.push([urlPath, { encoding, data }])
+}
+
 // Find all CSS links and inline them
 const linkRegex = /<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g
 html = html.replace(linkRegex, (match, href) => {
