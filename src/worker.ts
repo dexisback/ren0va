@@ -1,4 +1,3 @@
-import iconsData from "../icons.json"
 import { resolveIcon } from "./icons"
 import { fuzzyMatch } from "./fuzzy"
 import { generateSvg } from "./generate"
@@ -6,16 +5,38 @@ import { LANDING_HTML } from "./landing"
 import { LANDING_ASSETS } from "./landing-assets"
 
 // ---------------------------------------------------------------------------
-// Data and Types
+// Lazy-load icons.json from external URL to keep worker bundle small
 // ---------------------------------------------------------------------------
 
-const icons = Object.fromEntries(
-  Object.entries(iconsData).map(([k, v]) => [k.toLowerCase(), v])
-) as Record<string, string>
+let ICONS_CACHE: Record<string, string> | null = null
+
+async function loadIconsJson(iconsUrl: string): Promise<Record<string, string>> {
+  if (ICONS_CACHE) return ICONS_CACHE
+
+  if (!iconsUrl) throw new Error("ICONS_URL not configured")
+
+  try {
+    const res = await fetch(iconsUrl)
+    if (!res.ok) throw new Error(`failed to fetch icons.json: ${res.status}`)
+
+    const data = (await res.json()) as Record<string, string>
+    ICONS_CACHE = Object.fromEntries(
+      Object.entries(data).map(([k, v]) => [k.toLowerCase(), String(v)])
+    ) as Record<string, string>
+    return ICONS_CACHE
+  } catch (err) {
+    throw err
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Data and Types
+// ---------------------------------------------------------------------------
 
 type Env = {
   SUPABASE_URL: string
   SUPABASE_SERVICE_ROLE_KEY?: string
+  ICONS_URL?: string
 }
 
 type Theme = "dark" | "light"
@@ -162,14 +183,24 @@ async function resolveSvg(name: string, env: Env, theme: Theme): Promise<string 
     return fetchCustomIconSvg(env, customPath, theme)
   }
 
-  const matched = fuzzyMatch(name)
+  const iconsUrl = env.ICONS_URL ?? ""
+  const iconsMap = await loadIconsJson(iconsUrl)
+
+  // Extract unique base icon names (remove -dark/-light suffixes) for fuzzy matching
+  const names = [...new Set(
+    Object.keys(iconsMap)
+      .map(n => n.replace(/-(dark|light)$/, ""))
+      .map(n => n.toLowerCase())
+  )]
+
+  const matched = fuzzyMatch(name, names)
   const key = resolveIcon(matched, theme)
-  if (icons[key]) {
-    return icons[key]
+  if (iconsMap[key]) {
+    return iconsMap[key]
   }
 
   const baseKey = matched.toLowerCase().trim()
-  return icons[baseKey] ?? null
+  return iconsMap[baseKey] ?? null
 }
 
 // ---------------------------------------------------------------------------

@@ -7,5 +7,5 @@ routes= [
 ]
 [vars]
 SUPABASE_URL = "https://qxxcdxafqxxtwzxbflys.supabase.co"
-
+ICONS_URL = "https://qxxcdxafqxxtwzxbflys.supabase.co/storage/v1/object/public/icons/icons.json"
 

@@ -1,11 +1,5 @@
-import iconsData from "../icons.json"
-
-
-const names = [...new Set(Object.keys(iconsData)
-  .map(name => name.replace(/-(dark|light)$/, ""))
-  .map(n => n.toLowerCase())
-)]
-
+// NOTE: icon names are now extracted dynamically from the loaded icons map
+// to avoid bundling icons.json. See fuzzyMatchWithNames for the new signature.
 
 function levenshteinAlgo(a: string, b: string) {
 
@@ -34,8 +28,14 @@ function levenshteinAlgo(a: string, b: string) {
   return dp[a.length]![b.length]!
 }
 
-export function fuzzyMatch(input: string): string {
+export function fuzzyMatch(input: string, names?: string[]): string {
   const clean = input.toLowerCase().trim()
+  
+  // If no names provided, return clean input (names will be passed from worker)
+  if (!names || names.length === 0) {
+    return clean
+  }
+
   if (names.includes(clean)) {
     return clean
   }
