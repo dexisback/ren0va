@@ -5,8 +5,14 @@ const RAW_DIR = "icons/raw-svg"
 const OUT_DIR = "icons/processed-svg"
 
 const THEMES = {
-  dark: "#1e1e2e",
-  light: "#ffffff",
+  dark: {
+    bg: "#1e1e2e",
+    fg: "#f8fafc",
+  },
+  light: {
+    bg: "#ffffff",
+    fg: "#0f172a",
+  },
 }
 
 for (const file of fs.readdirSync(RAW_DIR)) {
@@ -32,11 +38,11 @@ for (const file of fs.readdirSync(RAW_DIR)) {
   const x = 8 + (32 - vbWidth * scale) / 2
   const y = 8 + (32 - vbHeight * scale) / 2
 
-  for (const [theme, bg] of Object.entries(THEMES)) {
+  for (const [theme, palette] of Object.entries(THEMES)) {
     const out = `
 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
-  <rect width="48" height="48" rx="6" fill="${bg}"/>
-  <g transform="translate(${x}, ${y}) scale(${scale})">
+  <rect width="48" height="48" rx="6" fill="${palette.bg}"/>
+  <g transform="translate(${x}, ${y}) scale(${scale})" fill="${palette.fg}">
     ${inner}
   </g>
 </svg>
