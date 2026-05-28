@@ -12,6 +12,8 @@ Lightning-fast, exhaustive skill icons for your GitHub profile and READMEs.
 
 Ren0va provides a high-performance HTTP API to generate stitched SVG grids of developer tool icons. It serves as a performant and flexible alternative to existing skill-sharing tools, offering an exhaustive icon set and the ability to serve custom user-uploaded SVGs at scale.
 
+Includes a curated set of 1210 icons (light + dark variants where available).
+
 ---
 
 ## Section 1: Documentation
@@ -104,6 +106,7 @@ graph TD
 -   **Server-Side Secret Management:** Unlike typical client-side implementations, Ren0va handles all communication with Supabase on the server side (Cloudflare Worker). Secure credentials and signed-url logic never touch the client browser, preventing token exposure and ensuring that custom icon fetching is strictly controlled.
 -   **Fuzzy Matching (Levenshtein Distance):** The `src/fuzzy.ts` module implements the Levenshtein distance algorithm to handle typos. If a user requests `typscript`, the system resolves it to `typescript` in O(n) time against the icon map, preventing broken image renders.
 -   **Atomic Build System:** The project uses a multi-stage build process. `process.ts` standardizes raw SVGs into 48x48 tiles with consistent padding and corner radii, while `build.ts` compiles these into a single `icons.json` to eliminate filesystem I/O at runtime.
+    - **Build-time SVG Normalization:** `build.ts` now includes an additional normalization pass to detect low-luminance paint tokens (near-black fills/strokes) and rewrite them to the dark-theme foreground color. This ensures consistent, readable icons in the dark theme across mixed-source SVGs.
 -   **Pure Inline Performance:** To achieve near-zero Cumulative Layout Shift (CLS) and instant interaction on the landing page, `scripts/embed-landing.ts` injects critical assets directly into the build. The frontend uses explicitly vanilla CSS and inline JS—no heavy frameworks or hydration cycles.
 -   **Theme Fallback Engine:** The `resolveIcon` logic handles dark/light variant resolution with intelligent fallbacks, ensuring that if a specific theme variant is missing, a legible alternative is served without error.
 
@@ -186,6 +189,8 @@ A huge thanks to the creators of the open-source fonts used in this project:
 Both are stored in `public/fonts/` and serve as the visual backbone of the Ren0va brand.
 
 Special thanks to [**skillicons.dev**](https://skillicons.dev). Many of the default icons in this library were sourced from their repository under fair use, providing the foundational set for our exhaustive library.
+
+Also thank you to [**devicon/devicon**](https://devicon.dev) for additional icon sources that helped make this an exhaustive collection :)
 
 ---
 
