@@ -16,7 +16,12 @@ async function loadIconsJson(iconsUrl: string): Promise<Record<string, string>> 
   if (!iconsUrl) throw new Error("ICONS_URL not configured")
 
   try {
-    const res = await fetch(iconsUrl)
+    const res = await fetch(iconsUrl, {
+      cf: {
+        cacheEverything: true,
+        cacheTtl: 2592000,
+      },
+    })
     if (!res.ok) throw new Error(`failed to fetch icons.json: ${res.status}`)
 
     const data = (await res.json()) as Record<string, string>
@@ -163,13 +168,23 @@ function validateUploadFile(file: FileLike): string | null {
 async function fetchCustomIconSvg(env: Env, customPath: string, theme: Theme): Promise<string | null> {
   const baseUrl = trimTrailingSlash(env.SUPABASE_URL)
   const themedUrl = `${baseUrl}/storage/v1/object/public/icons/${customPath}-${theme}.svg`
-  const themed = await fetch(themedUrl)
+  const themed = await fetch(themedUrl, {
+    cf: {
+      cacheEverything: true,
+      cacheTtl: 2592000,
+    },
+  })
   if (themed.ok) {
     return themed.text()
   }
 
   const baseIconUrl = `${baseUrl}/storage/v1/object/public/icons/${customPath}.svg`
-  const base = await fetch(baseIconUrl)
+  const base = await fetch(baseIconUrl, {
+    cf: {
+      cacheEverything: true,
+      cacheTtl: 2592000,
+    },
+  })
   if (!base.ok) {
     return null
   }
@@ -324,14 +339,30 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
   }
 }
 
-async function handleIcons(url: URL, env: Env): Promise<Response> {
-  const startTotal = performance.now()
-  const timings: string[] = []
-
+async function handleIcons(request: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+  const url = new URL(request.url)
   const raw = url.searchParams.get("i") ?? ""
   if (!raw) {
     return textResponse("missing ?i=param", 400)
   }
+
+  // Canonicalize cache key (sort query params so ?i=a&theme=dark and ?theme=dark&i=a hit the same cache)
+  const canonicalUrl = new URL(request.url)
+  canonicalUrl.searchParams.sort()
+  const cacheKey = new Request(canonicalUrl.toString(), {
+    method: "GET",
+  })
+
+  const cache = caches.default
+  const cachedResponse = await cache.match(cacheKey)
+  if (cachedResponse) {
+    const hit = new Response(cachedResponse.body, cachedResponse)
+    hit.headers.set("X-Ren0va-Cache", "HIT")
+    return hit
+  }
+
+  const startTotal = performance.now()
+  const timings: string[] = []
 
   const theme = parseTheme(url.searchParams.get("theme"))
   const perLine = parsePerLine(url.searchParams.get("perline"))
@@ -357,14 +388,29 @@ async function handleIcons(url: URL, env: Env): Promise<Response> {
 
   timings.push(`total;dur=${(performance.now() - startTotal).toFixed(2)}`)
 
-  return new Response(output, {
+  const response = new Response(output, {
     headers: {
       "Content-Type": "image/svg+xml",
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "public, max-age=604800, s-maxage=2592000, stale-while-revalidate=86400",
+      "CDN-Cache-Control": "max-age=2592000",
+      "Cloudflare-CDN-Cache-Control": "max-age=2592000",
       "Access-Control-Allow-Origin": "*",
+      "X-Ren0va-Cache": "MISS",
       "Server-Timing": timings.join(", "),
     },
   })
+
+  try {
+    if (ctx) {
+      ctx.waitUntil(cache.put(cacheKey, response.clone()))
+    } else {
+      await cache.put(cacheKey, response.clone())
+    }
+  } catch {
+    // Non-blocking if cache.put fails
+  }
+
+  return response
 }
 
 // ---------------------------------------------------------------------------
@@ -372,7 +418,7 @@ async function handleIcons(url: URL, env: Env): Promise<Response> {
 // ---------------------------------------------------------------------------
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url)
 
     if (request.method === "OPTIONS") {
@@ -392,7 +438,7 @@ export default {
     }
 
     if (url.pathname === "/icons" && request.method === "GET") {
-      return handleIcons(url, env)
+      return handleIcons(request, env, ctx)
     }
 
     return textResponse("not found", 404)
